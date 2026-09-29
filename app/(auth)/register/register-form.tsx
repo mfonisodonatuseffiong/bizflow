@@ -7,7 +7,7 @@ import { businessTypes, countries } from "@/features/business/config";
 import { registerAction, type RegisterState } from "@/features/auth/actions";
 
 const inputClass =
-  "block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20";
+  "block w-full rounded-xl border border-slate-200 bg-white/80 px-3.5 py-2.5 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20";
 
 function passwordScore(password: string) {
   let score = 0;
@@ -18,7 +18,7 @@ function passwordScore(password: string) {
 }
 
 const strengthLabels = ["", "Weak", "Good", "Strong"];
-const strengthColors = ["", "bg-red-500", "bg-amber-500", "bg-emerald-500"];
+const strengthColors = ["", "bg-red-500", "bg-amber-500", "bg-brand-500"];
 
 function Field({
   label,
@@ -227,7 +227,7 @@ export default function RegisterForm() {
         {state.status === "success" ? (
           <div
             role="status"
-            className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+            className="rounded-lg border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-brand-700"
           >
             Account created. Signing in is the next step we build.
           </div>
@@ -236,7 +236,7 @@ export default function RegisterForm() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-600/40 focus:ring-offset-2"
+          className="w-full rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-600/40 focus:ring-offset-2 disabled:opacity-60"
         >
           {pending ? "Creating account..." : "Create account"}
         </button>
@@ -245,7 +245,7 @@ export default function RegisterForm() {
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-medium text-emerald-700 hover:text-emerald-800"
+            className="font-medium text-brand-700 hover:text-brand-600"
           >
             Sign in
           </Link>

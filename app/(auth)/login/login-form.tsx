@@ -6,7 +6,7 @@ import { startTransition, useActionState } from "react";
 import { loginAction, type LoginState } from "@/features/auth/login";
 
 const inputClass =
-  "block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20";
+  "block w-full rounded-xl border border-slate-200 bg-white/80 px-3.5 py-2.5 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20";
 
 export default function LoginForm({ notice }: { notice?: string }) {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(
@@ -90,14 +90,14 @@ export default function LoginForm({ notice }: { notice?: string }) {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-600/40 focus:ring-offset-2 disabled:opacity-60"
+          className="w-full rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-600/40 focus:ring-offset-2 disabled:opacity-60"
         >
           {pending ? "Signing in..." : "Sign in"}
         </button>
 
         <p className="text-center text-sm text-slate-600">
           New to BizFlow?{" "}
-          <Link href="/register" className="font-medium text-emerald-700 hover:text-emerald-800">
+          <Link href="/register" className="font-medium text-brand-700 hover:text-brand-600">
             Create an account
           </Link>
         </p>
