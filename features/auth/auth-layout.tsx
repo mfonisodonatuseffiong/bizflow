@@ -1,6 +1,6 @@
 function LogoMark() {
   return (
-    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/30">
+    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-white shadow-lg shadow-brand-500/30">
       <svg
         viewBox="0 0 24 24"
         fill="none"
@@ -22,7 +22,7 @@ function CheckIcon() {
     <svg
       viewBox="0 0 20 20"
       fill="currentColor"
-      className="mt-0.5 h-5 w-5 flex-none text-emerald-400"
+      className="mt-0.5 h-5 w-5 flex-none text-brand-400"
       aria-hidden="true"
     >
       <path
@@ -34,18 +34,33 @@ function CheckIcon() {
   );
 }
 
+function Background() {
+  return (
+    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+      <div className="absolute -left-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-brand-500/25 blur-3xl" />
+      <div className="absolute -bottom-40 right-0 h-[30rem] w-[30rem] rounded-full bg-teal-400/15 blur-3xl" />
+      <div className="absolute left-1/2 top-1/3 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
+      <svg className="absolute inset-0 h-full w-full text-white/[0.06]">
+        <defs>
+          <pattern id="auth-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+            <path d="M48 0H0V48" fill="none" stroke="currentColor" strokeWidth="1" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#auth-grid)" />
+      </svg>
+    </div>
+  );
+}
+
 function BrandPanel() {
   return (
-    <aside className="relative hidden overflow-hidden bg-slate-950 text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
-      <div className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 -right-20 h-96 w-96 rounded-full bg-teal-400/10 blur-3xl" />
-
-      <div className="relative flex items-center gap-3">
+    <aside className="relative hidden text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
+      <div className="flex items-center gap-3">
         <LogoMark />
         <span className="text-xl font-semibold tracking-tight">BizFlow</span>
       </div>
 
-      <div className="relative max-w-md">
+      <div className="max-w-md">
         <h2 className="text-4xl font-semibold leading-tight tracking-tight">
           Run your whole business from one place.
         </h2>
@@ -69,42 +84,41 @@ function BrandPanel() {
           </li>
         </ul>
 
-        <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
-          <p className="text-xs uppercase tracking-wider text-slate-400">
-            Today&apos;s sales (preview)
+        <div className="mt-10 rounded-2xl border border-white/15 bg-white/[0.07] p-5 shadow-xl shadow-black/20 backdrop-blur-md">
+          <p className="text-xs uppercase tracking-wider text-slate-300">
+            Sample dashboard (preview only)
           </p>
-          <p className="mt-1 text-3xl font-semibold">₦482,500</p>
+          <p className="mt-1 text-3xl font-semibold">482,500</p>
           <div className="mt-4 grid grid-cols-3 gap-3 text-xs">
             <div>
-              <p className="text-slate-400">Orders</p>
+              <p className="text-slate-300">Orders</p>
               <p className="mt-0.5 text-base font-medium">86</p>
             </div>
             <div>
-              <p className="text-slate-400">Customers</p>
+              <p className="text-slate-300">Customers</p>
               <p className="mt-0.5 text-base font-medium">54</p>
             </div>
             <div>
-              <p className="text-slate-400">Low stock</p>
+              <p className="text-slate-300">Low stock</p>
               <p className="mt-0.5 text-base font-medium text-amber-300">7</p>
             </div>
           </div>
         </div>
       </div>
 
-      <p className="relative text-xs text-slate-500">
-        © {new Date().getFullYear()} BizFlow
-      </p>
+      <p className="text-xs text-slate-400">© {new Date().getFullYear()} BizFlow</p>
     </aside>
   );
 }
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
+    <div className="relative isolate grid min-h-screen overflow-hidden bg-slate-950 lg:grid-cols-2">
+      <Background />
       <BrandPanel />
 
-      <main className="flex items-center justify-center bg-white px-6 py-12 text-slate-900 sm:px-12">
-        <div className="w-full max-w-md">
+      <main className="flex items-center justify-center px-4 py-10 sm:px-12">
+        <div className="w-full max-w-md rounded-3xl border border-white/30 bg-white/85 p-7 text-slate-900 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-10">
           <div className="mb-8 flex items-center gap-3 lg:hidden">
             <LogoMark />
             <span className="text-xl font-semibold tracking-tight">BizFlow</span>
