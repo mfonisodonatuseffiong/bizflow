@@ -42,6 +42,8 @@ model Business {
   timezone    String
   createdAt   DateTime             @default(now())
   memberships BusinessMembership[]
+  categories  Category[]
+  products    Product[]
 }
 
 model User {
@@ -79,4 +81,34 @@ model Account {
 
   @@unique([provider, providerAccountId])
   @@index([userId])
+}
+
+model Category {
+  id         String   @id @default(cuid())
+  businessId String
+  name       String
+  createdAt  DateTime @default(now())
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@unique([businessId, name])
+}
+
+model Product {
+  id         String   @id @default(cuid())
+  businessId String
+  categoryId String?
+  name       String
+  sku        String?
+  priceMinor Int
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@unique([businessId, sku])
+  @@index([businessId])
+  @@index([categoryId])
 }
