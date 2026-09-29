@@ -1,3 +1,5 @@
+import { AuthBackground } from "@/features/auth/auth-background";
+
 function LogoMark() {
   return (
     <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-white shadow-lg shadow-brand-500/30">
@@ -34,23 +36,6 @@ function CheckIcon() {
   );
 }
 
-function Background() {
-  return (
-    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-      <div className="absolute -left-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-brand-500/25 blur-3xl" />
-      <div className="absolute -bottom-40 right-0 h-[30rem] w-[30rem] rounded-full bg-teal-400/15 blur-3xl" />
-      <div className="absolute left-1/2 top-1/3 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-      <svg className="absolute inset-0 h-full w-full text-white/[0.06]">
-        <defs>
-          <pattern id="auth-grid" width="48" height="48" patternUnits="userSpaceOnUse">
-            <path d="M48 0H0V48" fill="none" stroke="currentColor" strokeWidth="1" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#auth-grid)" />
-      </svg>
-    </div>
-  );
-}
 
 function BrandPanel() {
   return (
@@ -114,7 +99,7 @@ function BrandPanel() {
 export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative isolate grid min-h-screen overflow-hidden bg-slate-950 lg:grid-cols-2">
-      <Background />
+      <AuthBackground />
       <BrandPanel />
 
       <main className="flex items-center justify-center px-4 py-10 sm:px-12">
