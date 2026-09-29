@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum BusinessType {
+  SUPERMARKET
+  MINI_MART
+  PROVISION_STORE
+  ELECTRONICS
+  FASHION
+  GENERAL_MERCHANDISE
+}
+
+enum Role {
+  OWNER
+  MANAGER
+  STAFF
+}
+
+model Business {
+  id        String       @id @default(cuid())
+  name      String
+  type      BusinessType
+  country   String       @default("NG")
+  currency  String       @default("NGN")
+  timezone  String       @default("Africa/Lagos")
+  createdAt DateTime     @default(now())
+  users     User[]
+}
+
+model User {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  name       String
+  role       Role     @default(STAFF)
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@index([businessId])
+}
