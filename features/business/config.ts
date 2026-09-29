@@ -32,3 +32,7 @@ export const countries = [
   { code: "GB", name: "United Kingdom", currency: "GBP", timezone: "Europe/London" },
   { code: "US", name: "United States", currency: "USD", timezone: "America/New_York" },
 ] as const;
+
+export function getBusinessCategory(type: BusinessTypeValue): BusinessCategory {
+  return businessTypes.find((t) => t.value === type)!.category;
+}
