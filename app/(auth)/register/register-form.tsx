@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { GoogleButton } from "@/features/auth/google-button";
 import { startTransition, useActionState, useState } from "react";
 import { businessTypes, countries } from "@/features/business/config";
 import { registerAction, type RegisterState } from "@/features/auth/actions";
@@ -71,7 +72,16 @@ export default function RegisterForm() {
         Set up your business in a couple of minutes. You&apos;ll be the owner.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+      <div className="mt-8">
+        <GoogleButton label="Continue with Google" />
+        <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-wider text-slate-400">
+          <span className="h-px flex-1 bg-slate-200" />
+          or
+          <span className="h-px flex-1 bg-slate-200" />
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
         <Field label="Full name" htmlFor="name">
           <input
             id="name"

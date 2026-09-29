@@ -48,9 +48,10 @@ model User {
   id           String               @id @default(cuid())
   email        String               @unique
   name         String
-  passwordHash String
+  passwordHash String?
   createdAt    DateTime             @default(now())
   memberships  BusinessMembership[]
+  accounts     Account[]
 }
 
 model BusinessMembership {
@@ -65,4 +66,17 @@ model BusinessMembership {
 
   @@unique([userId, businessId])
   @@index([businessId])
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  createdAt         DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
 }

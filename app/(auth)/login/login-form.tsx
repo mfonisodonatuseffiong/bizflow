@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { GoogleButton } from "@/features/auth/google-button";
 import { startTransition, useActionState } from "react";
 import { loginAction, type LoginState } from "@/features/auth/login";
 
 const inputClass =
   "block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20";
 
-export default function LoginForm() {
+export default function LoginForm({ notice }: { notice?: string }) {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(
     loginAction,
     { status: "idle" },
@@ -28,7 +29,16 @@ export default function LoginForm() {
         Sign in to your BizFlow workspace.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+      <div className="mt-8">
+        <GoogleButton label="Continue with Google" />
+        <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-wider text-slate-400">
+          <span className="h-px flex-1 bg-slate-200" />
+          or
+          <span className="h-px flex-1 bg-slate-200" />
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-700">
             Email
@@ -58,6 +68,15 @@ export default function LoginForm() {
             className={inputClass}
           />
         </div>
+
+        {notice && state.status !== "error" ? (
+          <div
+            role="alert"
+            className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+          >
+            {notice}
+          </div>
+        ) : null}
 
         {state.status === "error" ? (
           <div
