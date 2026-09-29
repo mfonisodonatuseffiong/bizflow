@@ -8,12 +8,23 @@ datasource db {
 }
 
 enum BusinessType {
+  // Retail
   SUPERMARKET
   MINI_MART
   PROVISION_STORE
   ELECTRONICS
   FASHION
   GENERAL_MERCHANDISE
+  // Service
+  MECHANIC
+  ELECTRICIAN
+  PLUMBER
+  CLEANER
+  AC_TECHNICIAN
+  TAILOR
+  SALON_BARBER
+  PHOTOGRAPHER
+  REPAIR
 }
 
 enum Role {
@@ -23,24 +34,35 @@ enum Role {
 }
 
 model Business {
-  id        String       @id @default(cuid())
-  name      String
-  type      BusinessType
-  country   String       @default("NG")
-  currency  String       @default("NGN")
-  timezone  String       @default("Africa/Lagos")
-  createdAt DateTime     @default(now())
-  users     User[]
+  id          String               @id @default(cuid())
+  name        String
+  type        BusinessType
+  country     String
+  currency    String
+  timezone    String
+  createdAt   DateTime             @default(now())
+  memberships BusinessMembership[]
 }
 
 model User {
+  id           String               @id @default(cuid())
+  email        String               @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime             @default(now())
+  memberships  BusinessMembership[]
+}
+
+model BusinessMembership {
   id         String   @id @default(cuid())
-  email      String   @unique
-  name       String
-  role       Role     @default(STAFF)
+  userId     String
   businessId String
-  business   Business @relation(fields: [businessId], references: [id])
+  role       Role     @default(STAFF)
   createdAt  DateTime @default(now())
 
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
   @@index([businessId])
 }
