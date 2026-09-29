@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { startTransition, useActionState, useState } from "react";
 import { businessTypes, countries } from "@/features/business/config";
+import { registerAction, type RegisterState } from "@/features/auth/actions";
 
 const inputClass =
   "block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20";
@@ -47,14 +48,18 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [countryCode, setCountryCode] = useState("NG");
-  const [submitted, setSubmitted] = useState(false);
+  const [state, formAction, pending] = useActionState<RegisterState, FormData>(
+    registerAction,
+    { status: "idle" },
+  );
 
   const country = countries.find((c) => c.code === countryCode) ?? countries[0];
   const score = password.length === 0 ? 0 : Math.max(passwordScore(password), 1);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    const data = new FormData(event.currentTarget);
+    startTransition(() => formAction(data));
   }
 
   return (
@@ -200,21 +205,30 @@ export default function RegisterForm() {
           </select>
         </Field>
 
-        {submitted ? (
+        {state.status === "error" ? (
+          <div
+            role="alert"
+            className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+          >
+            {state.message}
+          </div>
+        ) : null}
+
+        {state.status === "success" ? (
           <div
             role="status"
             className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
           >
-            The form looks good. Saving your account gets connected in the next
-            step.
+            Account created. Signing in is the next step we build.
           </div>
         ) : null}
 
         <button
           type="submit"
+          disabled={pending}
           className="w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-600/40 focus:ring-offset-2"
         >
-          Create account
+          {pending ? "Creating account..." : "Create account"}
         </button>
 
         <p className="text-center text-sm text-slate-600">

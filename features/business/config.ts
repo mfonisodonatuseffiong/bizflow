@@ -1,21 +1,21 @@
 export type BusinessCategory = "RETAIL" | "SERVICE";
 
 export const businessTypes = [
-  { value: "supermarket", label: "Supermarket", category: "RETAIL" },
-  { value: "mini_mart", label: "Mini-mart", category: "RETAIL" },
-  { value: "provision_store", label: "Provision store", category: "RETAIL" },
-  { value: "electronics", label: "Electronics shop", category: "RETAIL" },
-  { value: "fashion", label: "Fashion store", category: "RETAIL" },
-  { value: "general_merchandise", label: "General merchandise", category: "RETAIL" },
-  { value: "mechanic", label: "Mechanic / auto repair", category: "SERVICE" },
-  { value: "electrician", label: "Electrician", category: "SERVICE" },
-  { value: "plumber", label: "Plumber", category: "SERVICE" },
-  { value: "cleaning", label: "Cleaning service", category: "SERVICE" },
-  { value: "ac_technician", label: "AC technician", category: "SERVICE" },
-  { value: "tailor", label: "Tailor", category: "SERVICE" },
-  { value: "salon_barber", label: "Salon / barber", category: "SERVICE" },
-  { value: "photographer", label: "Photographer", category: "SERVICE" },
-  { value: "repair", label: "Repair business", category: "SERVICE" },
+  { value: "SUPERMARKET", label: "Supermarket", category: "RETAIL" },
+  { value: "MINI_MART", label: "Mini-mart", category: "RETAIL" },
+  { value: "PROVISION_STORE", label: "Provision store", category: "RETAIL" },
+  { value: "ELECTRONICS", label: "Electronics shop", category: "RETAIL" },
+  { value: "FASHION", label: "Fashion store", category: "RETAIL" },
+  { value: "GENERAL_MERCHANDISE", label: "General merchandise", category: "RETAIL" },
+  { value: "MECHANIC", label: "Mechanic / auto repair", category: "SERVICE" },
+  { value: "ELECTRICIAN", label: "Electrician", category: "SERVICE" },
+  { value: "PLUMBER", label: "Plumber", category: "SERVICE" },
+  { value: "CLEANER", label: "Cleaning service", category: "SERVICE" },
+  { value: "AC_TECHNICIAN", label: "AC technician", category: "SERVICE" },
+  { value: "TAILOR", label: "Tailor", category: "SERVICE" },
+  { value: "SALON_BARBER", label: "Salon / barber", category: "SERVICE" },
+  { value: "PHOTOGRAPHER", label: "Photographer", category: "SERVICE" },
+  { value: "REPAIR", label: "Repair business", category: "SERVICE" },
 ] as const satisfies readonly {
   value: string;
   label: string;
