@@ -2,7 +2,9 @@
 
 import argon2 from "argon2";
 import { businessTypes, countries } from "@/features/business/config";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { createSession } from "@/lib/session";
 
 export type RegisterState = {
   status: "idle" | "success" | "error";
@@ -46,12 +48,14 @@ export async function registerAction(
   const country = countries.find((c) => c.code === countryCode);
   if (!country) return fail("Select a country.");
 
+  let userId: string;
   try {
     const passwordHash = await argon2.hash(password);
 
     // One nested create = one transaction: user, business and OWNER
     // membership are all created, or none are.
-    await prisma.user.create({
+    const user = await prisma.user.create({
+      select: { id: true },
       data: {
         name,
         email,
@@ -72,6 +76,7 @@ export async function registerAction(
         },
       },
     });
+    userId = user.id;
   } catch (error) {
     if (isUniqueViolation(error)) {
       return fail("An account with this email already exists.");
@@ -80,5 +85,6 @@ export async function registerAction(
     return fail("Something went wrong. Please try again.");
   }
 
-  return { status: "success" };
+  await createSession(userId);
+  redirect("/dashboard");
 }
