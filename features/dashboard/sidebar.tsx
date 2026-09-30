@@ -21,7 +21,7 @@ const paths: Record<NavIcon, string> = {
   settings: "M12 15a3 3 0 100-6 3 3 0 000 6zM19 12a7 7 0 00-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 00-2-1.2L14 3h-4l-.6 2.7a7 7 0 00-2 1.2l-2.3-1-2 3.4 2 1.5A7 7 0 005 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-1a7 7 0 002 1.2L10 21h4l.6-2.7a7 7 0 002-1.2l2.3 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z",
 };
 
-function Icon({ name }: { name: NavIcon }) {
+export function Icon({ name }: { name: NavIcon }) {
   return (
     <svg
       viewBox="0 0 24 24"

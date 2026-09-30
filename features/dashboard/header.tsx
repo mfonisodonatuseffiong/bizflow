@@ -6,11 +6,13 @@ export function Header({
   role,
   userName,
   userEmail,
+  menu,
 }: {
   businessName: string;
   role: string;
   userName: string;
   userEmail: string;
+  menu?: React.ReactNode;
 }) {
   const initials = userName
     .split(" ")
@@ -23,6 +25,7 @@ export function Header({
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-slate-200/70 bg-white/70 px-6 py-3 backdrop-blur-xl">
       <div className="flex min-w-0 items-center gap-3">
+        {menu}
         <h2 className="truncate text-sm font-semibold text-slate-900">{businessName}</h2>
         <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-700 ring-1 ring-brand-100">
           {role}

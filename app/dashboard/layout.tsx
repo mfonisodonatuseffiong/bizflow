@@ -4,6 +4,7 @@ import { getBusinessCategory } from "@/features/business/config";
 import { getNavItems } from "@/features/dashboard/nav";
 import { Sidebar } from "@/features/dashboard/sidebar";
 import { Header } from "@/features/dashboard/header";
+import { MobileNav } from "@/features/dashboard/mobile-nav";
 
 export default async function DashboardLayout({
   children,
@@ -22,6 +23,7 @@ export default async function DashboardLayout({
       <Sidebar items={items} businessName={business.name} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Header
+          menu={<MobileNav items={items} businessName={business.name} />}
           businessName={business.name}
           role={role}
           userName={user.name}

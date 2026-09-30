@@ -32,7 +32,7 @@ const shared: NavItem[] = [
 ];
 
 const retailCore: NavItem[] = [
-  { label: "Products", href: "/dashboard/products", icon: "products", soon: true },
+  { label: "Products", href: "/dashboard/products", icon: "products" },
   { label: "Inventory", href: "/dashboard/inventory", icon: "inventory", soon: true },
   { label: "Sales", href: "/dashboard/sales", icon: "sales", soon: true },
 ];
