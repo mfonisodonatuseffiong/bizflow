@@ -34,26 +34,28 @@ enum Role {
 }
 
 model Business {
-  id          String               @id @default(cuid())
-  name        String
-  type        BusinessType
-  country     String
-  currency    String
-  timezone    String
-  createdAt   DateTime             @default(now())
-  memberships BusinessMembership[]
-  categories  Category[]
-  products    Product[]
+  id             String               @id @default(cuid())
+  name           String
+  type           BusinessType
+  country        String
+  currency       String
+  timezone       String
+  createdAt      DateTime             @default(now())
+  memberships    BusinessMembership[]
+  categories     Category[]
+  products       Product[]
+  stockMovements StockMovement[]
 }
 
 model User {
-  id           String               @id @default(cuid())
-  email        String               @unique
-  name         String
-  passwordHash String?
-  createdAt    DateTime             @default(now())
-  memberships  BusinessMembership[]
-  accounts     Account[]
+  id             String               @id @default(cuid())
+  email          String               @unique
+  name           String
+  passwordHash   String?
+  createdAt      DateTime             @default(now())
+  memberships    BusinessMembership[]
+  accounts       Account[]
+  stockMovements StockMovement[]
 }
 
 model BusinessMembership {
@@ -105,10 +107,36 @@ model Product {
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
 
-  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  business       Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category       Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  stockMovements StockMovement[]
 
   @@unique([businessId, sku])
   @@index([businessId])
   @@index([categoryId])
+}
+
+enum StockMovementType {
+  OPENING
+  RESTOCK
+  SALE
+  ADJUSTMENT
+}
+
+model StockMovement {
+  id          String            @id @default(cuid())
+  businessId  String
+  productId   String
+  type        StockMovementType
+  quantity    Int
+  note        String?
+  createdById String?
+  createdAt   DateTime          @default(now())
+
+  business  Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdBy User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([businessId])
+  @@index([productId, createdAt])
 }

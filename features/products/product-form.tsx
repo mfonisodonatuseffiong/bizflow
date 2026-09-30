@@ -30,7 +30,7 @@ export function ProductForm({ currency }: { currency: string }) {
       className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
     >
       <h2 className="text-sm font-semibold text-slate-900">Add a product</h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-3">
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-slate-700">Name</label>
           <input id="name" name="name" required minLength={2} placeholder="e.g. Indomie Chicken 70g" className={inputClass} />
@@ -42,6 +42,10 @@ export function ProductForm({ currency }: { currency: string }) {
         <div>
           <label htmlFor="price" className="mb-1.5 block text-sm font-medium text-slate-700">Price ({currency})</label>
           <input id="price" name="price" required inputMode="decimal" placeholder="12.50" className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="openingStock" className="mb-1.5 block text-sm font-medium text-slate-700">Opening stock (optional)</label>
+          <input id="openingStock" name="openingStock" inputMode="numeric" placeholder="e.g. 24" className={inputClass} />
         </div>
       </div>
 
