@@ -18,7 +18,7 @@ export default async function DashboardLayout({
   const items = getNavItems(getBusinessCategory(business.type));
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-linear-to-br from-slate-50 via-white to-brand-50/60">
       <Sidebar items={items} businessName={business.name} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Header

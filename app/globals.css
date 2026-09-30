@@ -30,3 +30,31 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes bf-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes bf-draw { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
+@keyframes bf-spin { to { transform: rotate(360deg); } }
+@keyframes bf-pulse { 0%, 100% { opacity: 0.45; transform: scale(1); } 50% { opacity: 1; transform: scale(1.12); } }
+@keyframes bf-shimmer { to { background-position: 200% center; } }
+
+.bf-float { animation: bf-float 6s ease-in-out infinite; }
+.bf-draw { stroke-dasharray: 40; animation: bf-draw 1.4s ease-in-out infinite alternate; }
+.bf-spin-slow { animation: bf-spin 70s linear infinite; }
+.bf-spin { animation: bf-spin 1.2s linear infinite; }
+.bf-pulse { animation: bf-pulse 2s ease-in-out infinite; }
+.bf-shimmer { background-size: 200% auto; animation: bf-shimmer 6s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bf-float, .bf-draw, .bf-spin-slow, .bf-spin, .bf-pulse, .bf-shimmer { animation: none; }
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+@keyframes bf-ripple { 0% { transform: scale(0.6); opacity: 0.55; } 100% { transform: scale(2.4); opacity: 0; } }
+.bf-ripple { animation: bf-ripple 3.2s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) { .bf-ripple { animation: none; opacity: 0.2; } }
+
+@keyframes bf-ripple { 0% { transform: scale(0.6); opacity: 0.55; } 100% { transform: scale(2.4); opacity: 0; } }
+.bf-ripple { animation: bf-ripple 3.2s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) { .bf-ripple { animation: none; opacity: 0.2; } }
