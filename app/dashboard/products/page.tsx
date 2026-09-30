@@ -1,8 +1,9 @@
-import { requireBusinessContext } from "@/features/auth/context";
+import { canManageCatalog, requireBusinessContext } from "@/features/auth/context";
+import { ProductForm } from "@/features/products/product-form";
 import { listProducts } from "@/features/products/queries";
 
 export default async function ProductsPage() {
-  const { business } = await requireBusinessContext();
+  const { business, role } = await requireBusinessContext();
   const products = await listProducts(business.id);
 
   const money = new Intl.NumberFormat("en", {
@@ -19,10 +20,12 @@ export default async function ProductsPage() {
         </p>
       </div>
 
+      {canManageCatalog(role) ? <ProductForm currency={business.currency} /> : null}
+
       {products.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
           <p className="text-sm font-medium text-slate-700">No products yet</p>
-          <p className="mt-1 text-sm text-slate-500">Adding products is the next step we build.</p>
+          <p className="mt-1 text-sm text-slate-500">Add your first product using the form above.</p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
