@@ -1,4 +1,5 @@
 import { logoutAction } from "@/features/auth/login";
+import { SignOutButton } from "@/features/dashboard/sign-out-button";
 
 export function Header({
   businessName,
@@ -51,14 +52,7 @@ export function Header({
           </div>
         </div>
 
-        <form action={logoutAction}>
-          <button
-            type="submit"
-            className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
-          >
-            Sign out
-          </button>
-        </form>
+        <SignOutButton action={logoutAction} userName={userName} />
       </div>
     </header>
   );

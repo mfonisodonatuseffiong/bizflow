@@ -58,3 +58,7 @@ html { scroll-behavior: smooth; }
 @keyframes bf-ripple { 0% { transform: scale(0.6); opacity: 0.55; } 100% { transform: scale(2.4); opacity: 0; } }
 .bf-ripple { animation: bf-ripple 3.2s ease-out infinite; }
 @media (prefers-reduced-motion: reduce) { .bf-ripple { animation: none; opacity: 0.2; } }
+
+@keyframes bf-pop { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: none; } }
+.bf-pop[open] { animation: bf-pop 0.25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .bf-pop[open] { animation: none; } }
