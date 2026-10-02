@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { deleteProductAction } from "./actions";
+import { deleteProductWithStatusAction } from "./actions";
 
 export function DeleteProductButton({
   productId,
@@ -17,11 +17,13 @@ export function DeleteProductButton({
   function onConfirm() {
     startTransition(async () => {
       try {
-        const formData = new FormData();
-        formData.set("productId", productId);
-        await deleteProductAction(formData);
-        setOpen(false);
-        toast.success(`“${productName}” was deleted.`);
+        const result = await deleteProductWithStatusAction(productId);
+        if (result.status === "success") {
+          setOpen(false);
+          toast.success(`“${productName}” was deleted.`);
+        } else {
+          toast.error(result.message);
+        }
       } catch {
         toast.error("Could not delete the product. Please try again.");
       }

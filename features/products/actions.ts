@@ -10,6 +10,11 @@ export type ProductFormState = {
   message?: string;
 };
 
+export type DeleteProductResult = {
+  status: "success" | "error";
+  message: string;
+};
+
 export async function createProductAction(
   _previous: ProductFormState,
   formData: FormData,
@@ -161,27 +166,41 @@ export async function toggleProductActiveAction(formData: FormData): Promise<voi
   revalidatePath("/dashboard/sales");
 }
 
-export async function deleteProductAction(formData: FormData): Promise<void> {
+export async function deleteProductWithStatusAction(
+  productId: string,
+): Promise<DeleteProductResult> {
   const { business, role } = await requireBusinessContext();
-  if (!canManageCatalog(role)) return;
+  if (!canManageCatalog(role)) {
+    return { status: "error", message: "You don't have permission to delete products." };
+  }
+  if (!productId) {
+    return { status: "error", message: "Missing product id." };
+  }
 
-  const productId = String(formData.get("productId") ?? "");
-  if (!productId) return;
+  try {
+    // Soft-delete only products that belong to this business
+    const result = await prisma.product.updateMany({
+      where: {
+        id: productId,
+        businessId: business.id,
+        deletedAt: null, // already deleted → do nothing
+      },
+      data: {
+        deletedAt: new Date(),
+        isActive: false, // also deactivate so it can't be sold
+      },
+    });
 
-  // Soft-delete only products that belong to this business
-  await prisma.product.updateMany({
-    where: {
-      id: productId,
-      businessId: business.id,
-      deletedAt: null, // already deleted → do nothing
-    },
-    data: {
-      deletedAt: new Date(),
-      isActive: false, // also deactivate so it can't be sold
-    },
-  });
+    if (result.count === 0) {
+      return { status: "error", message: "Product not found or already deleted." };
+    }
+  } catch (error) {
+    console.error("deleteProductWithStatusAction failed", error);
+    return { status: "error", message: "Something went wrong. Please try again." };
+  }
 
   revalidatePath("/dashboard/products");
   revalidatePath("/dashboard/inventory");
   revalidatePath("/dashboard/sales");
+  return { status: "success", message: "Product deleted." };
 }
