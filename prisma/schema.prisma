@@ -45,6 +45,10 @@ model Business {
   categories     Category[]
   products       Product[]
   stockMovements StockMovement[]
+  customers      Customer[]
+  sales          Sale[]
+  payments       Payment[]
+  expenses       Expense[]
 }
 
 model User {
@@ -56,6 +60,7 @@ model User {
   memberships    BusinessMembership[]
   accounts       Account[]
   stockMovements StockMovement[]
+  expenses       Expense[]
 }
 
 model BusinessMembership {
@@ -98,22 +103,121 @@ model Category {
 }
 
 model Product {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   businessId String
   categoryId String?
   name       String
   sku        String?
   priceMinor Int
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
+  isActive   Boolean   @default(true)
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
 
   business       Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  category       Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category       Category?       @relation(fields: [categoryId], references: [id])
+  saleItems      SaleItem[]
   stockMovements StockMovement[]
 
   @@unique([businessId, sku])
-  @@index([businessId])
   @@index([categoryId])
+  @@index([businessId])
+  @@index([businessId, deletedAt, createdAt])
+}
+
+model Customer {
+  id         String   @id @default(cuid())
+  businessId String
+  name       String
+  phone      String?
+  email      String?
+  address    String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  sales    Sale[]
+
+  @@unique([businessId, phone])
+  @@index([businessId])
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+  MOBILE_MONEY
+}
+
+model Sale {
+  id          String   @id @default(cuid())
+  businessId  String
+  customerId  String?
+  createdById String?
+  totalMinor  Int
+  createdAt   DateTime @default(now())
+
+  business Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer Customer?  @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items    SaleItem[]
+  payments Payment[]
+
+  @@index([businessId, createdAt])
+}
+
+model SaleItem {
+  id             String  @id @default(cuid())
+  saleId         String
+  productId      String?
+  productName    String
+  quantity       Int
+  unitPriceMinor Int
+
+  sale    Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([saleId])
+  @@index([productId])
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  businessId  String
+  saleId      String
+  amountMinor Int
+  method      PaymentMethod
+  createdById String?
+  createdAt   DateTime      @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  sale     Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([saleId])
+}
+
+enum ExpenseCategory {
+  RENT
+  SALARIES
+  UTILITIES
+  TRANSPORT
+  SUPPLIES
+  MARKETING
+  OTHER
+}
+
+model Expense {
+  id          String          @id @default(cuid())
+  businessId  String
+  category    ExpenseCategory
+  description String
+  amountMinor Int
+  spentAt     DateTime        @default(now())
+  createdById String?
+  createdAt   DateTime        @default(now())
+
+  business  Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdBy User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([businessId, spentAt])
 }
 
 enum StockMovementType {
@@ -135,7 +239,7 @@ model StockMovement {
 
   business  Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  createdBy User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdBy User?    @relation(fields: [createdById], references: [id])
 
   @@index([businessId])
   @@index([productId, createdAt])

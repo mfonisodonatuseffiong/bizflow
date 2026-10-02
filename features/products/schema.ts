@@ -21,3 +21,4 @@ export const productSchema = z.object({
 });
 
 export type ProductInput = z.infer<typeof productSchema>;
+export const editProductSchema = productSchema.pick({ name: true, sku: true, price: true });

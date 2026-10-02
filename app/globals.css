@@ -1,21 +1,44 @@
 @import "tailwindcss";
 
+/* stylelint-disable at-rule-no-unknown */
+
+/* Brand colors. Being inside @theme is what creates classes like
+   bg-brand-500, text-accent-500, bg-card and bg-surface. */
 @theme {
-  --color-brand-50: #ecfdf5;
-  --color-brand-100: #d1fae5;
-  --color-brand-400: #34d399;
-  --color-brand-500: #10b981;
-  --color-brand-600: #059669;
-  --color-brand-700: #047857;
+  /* Page background (very dark navy) */
+  --color-surface: #021528;
+
+  /* Navy: cards and structure */
+  --color-brand-50: #e8f0f7;
+  --color-brand-100: #c5d8eb;
+  /* Light enough to read as text and icons on navy and slate-950 */
+  --color-brand-400: #7fb2e5;
+  --color-brand-500: #023b6d;
+  --color-brand-600: #02325c;
+  --color-brand-700: #012847;
+
+  /* Card surface (brand-500) and its hover state */
+  --color-card: #023b6d;
+  --color-card-hover: #04497f;
+
+  /* Coral: buttons */
+  --color-accent-400: #f07568;
+  --color-accent-500: #e74c3c;
+  --color-accent-600: #c0392b;
+}
+
+/* "inline" makes Tailwind read var(--background) directly, so the
+   dark-mode values below and the Geist font variables resolve correctly. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -28,37 +51,151 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Uses the Geist font loaded in the layout instead of a hard-coded Arial. */
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
-@keyframes bf-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-@keyframes bf-draw { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
-@keyframes bf-spin { to { transform: rotate(360deg); } }
-@keyframes bf-pulse { 0%, 100% { opacity: 0.45; transform: scale(1); } 50% { opacity: 1; transform: scale(1.12); } }
-@keyframes bf-shimmer { to { background-position: 200% center; } }
+@keyframes bf-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+@keyframes bf-draw {
+  from {
+    stroke-dashoffset: 40;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes bf-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes bf-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+@keyframes bf-shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+@keyframes bf-ripple {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+@keyframes bf-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 
-.bf-float { animation: bf-float 6s ease-in-out infinite; }
-.bf-draw { stroke-dasharray: 40; animation: bf-draw 1.4s ease-in-out infinite alternate; }
-.bf-spin-slow { animation: bf-spin 70s linear infinite; }
-.bf-spin { animation: bf-spin 1.2s linear infinite; }
-.bf-pulse { animation: bf-pulse 2s ease-in-out infinite; }
-.bf-shimmer { background-size: 200% auto; animation: bf-shimmer 6s linear infinite; }
+@keyframes bf-wave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.12em);
+  }
+}
+
+.bf-float {
+  animation: bf-float 6s ease-in-out infinite;
+}
+.bf-draw {
+  stroke-dasharray: 40;
+  animation: bf-draw 1.4s ease-in-out infinite alternate;
+}
+.bf-spin-slow {
+  animation: bf-spin 70s linear infinite;
+}
+.bf-spin {
+  animation: bf-spin 1.2s linear infinite;
+}
+.bf-pulse {
+  animation: bf-pulse 2s ease-in-out infinite;
+}
+.bf-shimmer {
+  background-size: 200% auto;
+  animation: bf-shimmer 6s linear infinite;
+}
+.bf-ripple {
+  animation: bf-ripple 3.2s ease-out infinite;
+}
+.bf-pop[open] {
+  animation: bf-pop 0.25s ease-out;
+}
+.bf-wave {
+  animation: bf-wave 2.6s ease-in-out infinite;
+}
+
+/* Smooth scrolling only for people who have not asked for reduced motion.
+   (Previously this rule sat after the reduced-motion block and overrode it.) */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .bf-float, .bf-draw, .bf-spin-slow, .bf-spin, .bf-pulse, .bf-shimmer { animation: none; }
+  .bf-float,
+  .bf-draw,
+  .bf-spin-slow,
+  .bf-spin,
+  .bf-pulse,
+  .bf-shimmer,
+  .bf-ripple,
+  .bf-wave,
+  .bf-pop[open] {
+    animation: none;
+  }
+
+  /* Without these, the frozen states look broken. */
+  .bf-draw {
+    stroke-dasharray: none; /* show the full line, not a dashed one */
+  }
+  .bf-shimmer {
+    background-size: 100% auto; /* show the whole gradient, not half of it */
+  }
+  .bf-ripple {
+    opacity: 0.2;
+  }
 }
 
-html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-
-@keyframes bf-ripple { 0% { transform: scale(0.6); opacity: 0.55; } 100% { transform: scale(2.4); opacity: 0; } }
-.bf-ripple { animation: bf-ripple 3.2s ease-out infinite; }
-@media (prefers-reduced-motion: reduce) { .bf-ripple { animation: none; opacity: 0.2; } }
-
-@keyframes bf-ripple { 0% { transform: scale(0.6); opacity: 0.55; } 100% { transform: scale(2.4); opacity: 0; } }
-.bf-ripple { animation: bf-ripple 3.2s ease-out infinite; }
-@media (prefers-reduced-motion: reduce) { .bf-ripple { animation: none; opacity: 0.2; } }
-
-@keyframes bf-pop { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: none; } }
-.bf-pop[open] { animation: bf-pop 0.25s ease-out; }
-@media (prefers-reduced-motion: reduce) { .bf-pop[open] { animation: none; } }
+/* Dropdown lists must be solid, not see-through, or they render white. */
+select {
+  color-scheme: dark;
+}
+select option,
+select optgroup {
+  background-color: #012847;
+  color: #ffffff;
+}
+select option:disabled {
+  color: #94a3b8;
+}

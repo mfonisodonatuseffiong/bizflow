@@ -1,81 +1,146 @@
 import { canManageCatalog, requireBusinessContext } from "@/features/auth/context";
+import { toggleProductActiveAction } from "@/features/products/actions";
+import { DeleteProductButton } from "@/features/products/delete-product-button";
+import { EditProduct } from "@/features/products/edit-product";
 import { ProductForm } from "@/features/products/product-form";
 import { listProducts } from "@/features/products/queries";
-import { getStockByProduct } from "@/features/stock/queries";
-import { RestockForm } from "@/features/stock/restock-form";
+import { prisma } from "@/lib/prisma";
+
+const LOW_STOCK_AT = 5;
+
+function formatPrice(priceMinor: number | bigint, currency: string) {
+  return new Intl.NumberFormat("en", {
+    style: "currency",
+    currency,
+  }).format(Number(priceMinor) / 100);
+}
 
 export default async function ProductsPage() {
   const { business, role } = await requireBusinessContext();
-  const [products, stock] = await Promise.all([
+  const [products, totals] = await Promise.all([
     listProducts(business.id),
-    getStockByProduct(business.id),
+    prisma.stockMovement.groupBy({
+      by: ["productId"],
+      where: { businessId: business.id },
+      _sum: { quantity: true },
+    }),
   ]);
+  const stockById = new Map(totals.map((t) => [t.productId, t._sum.quantity ?? 0]));
   const canManage = canManageCatalog(role);
-
-  const money = new Intl.NumberFormat("en", {
-    style: "currency",
-    currency: business.currency,
-  });
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Products</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          {products.length} {products.length === 1 ? "product" : "products"} in {business.name}
+        <h1 className="bg-linear-to-r from-white via-accent-500 to-orange-300 bg-clip-text text-2xl font-semibold tracking-tight text-transparent sm:text-3xl">
+          Products
+        </h1>
+        <p className="mt-1 text-sm text-slate-300">
+          {products.length === 0
+            ? "No products yet."
+            : `${products.length} ${products.length === 1 ? "product" : "products"} in ${business.name}`}
         </p>
       </div>
 
-      {canManage ? <ProductForm currency={business.currency} /> : null}
+      {canManage ? (
+        <ProductForm currency={business.currency} />
+      ) : (
+        <p className="rounded-xl border border-white/10 bg-card/60 px-4 py-3 text-sm text-slate-300">
+          Only owners and managers can add products.
+        </p>
+      )}
 
       {products.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
-          <p className="text-sm font-medium text-slate-700">No products yet</p>
-          <p className="mt-1 text-sm text-slate-500">Add your first product using the form above.</p>
+        <div className="rounded-2xl border border-dashed border-accent-500/40 bg-card/60 px-6 py-12 text-center">
+          <p className="text-sm font-semibold text-white">Nothing here yet</p>
+          <p className="mt-1 text-sm text-slate-300">
+            {canManage
+              ? "Add your first product with the form above."
+              : "Products will appear here once an owner or manager adds them."}
+          </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-5 py-3 font-medium">Name</th>
-                <th className="px-5 py-3 font-medium">SKU</th>
-                <th className="px-5 py-3 font-medium">Category</th>
-                <th className="px-5 py-3 text-right font-medium">Price</th>
-                <th className="px-5 py-3 text-right font-medium">In stock</th>
-                <th className="px-5 py-3 font-medium">Status</th>
-                {canManage ? <th className="px-5 py-3 font-medium">Actions</th> : null}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {products.map((p) => {
-                const onHand = stock.get(p.id) ?? 0;
-                return (
-                  <tr key={p.id}>
-                    <td className="px-5 py-3 font-medium text-slate-900">{p.name}</td>
-                    <td className="px-5 py-3 text-slate-500">{p.sku ?? "—"}</td>
-                    <td className="px-5 py-3 text-slate-500">{p.category?.name ?? "—"}</td>
-                    <td className="px-5 py-3 text-right text-slate-900">{money.format(p.priceMinor / 100)}</td>
-                    <td
-                      className={`px-5 py-3 text-right font-medium ${onHand <= 0 ? "text-amber-600" : "text-slate-900"}`}
-                    >
-                      {onHand}
-                    </td>
-                    <td className="px-5 py-3">
-                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${p.isActive ? "bg-brand-50 text-brand-700" : "bg-slate-100 text-slate-500"}`}>
-                        {p.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    {canManage ? (
-                      <td className="px-5 py-3">
-                        <RestockForm productId={p.id} productName={p.name} />
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-card shadow-xl shadow-black/30">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-linear-to-r from-accent-600 via-accent-500 to-orange-400"
+          />
+          <div className="overflow-x-auto pt-1 pb-16">
+            <table className="w-full min-w-[40rem] text-left text-sm">
+              <thead>
+                <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-300">
+                  <th className="px-5 py-3 font-medium">Name</th>
+                  <th className="px-5 py-3 font-medium">SKU</th>
+                  <th className="px-5 py-3 font-medium">Category</th>
+                  <th className="px-5 py-3 text-right font-medium">Price</th>
+                  <th className="px-5 py-3 text-right font-medium">Stock</th>
+                  <th className="px-5 py-3 font-medium">Status</th>
+                  {canManage && <th className="px-5 py-3 text-right font-medium">Actions</th>}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {products.map((p) => {
+                  const stock = stockById.get(p.id) ?? 0;
+                  return (
+                    <tr key={p.id} className="transition hover:bg-white/5">
+                      <td className="px-5 py-3.5 font-medium text-white">{p.name}</td>
+                      <td className="px-5 py-3.5 text-slate-300">{p.sku ?? "-"}</td>
+                      <td className="px-5 py-3.5 text-slate-300">{p.category?.name ?? "-"}</td>
+                      <td className="px-5 py-3.5 text-right font-semibold text-white">
+                        {formatPrice(p.priceMinor, business.currency)}
                       </td>
-                    ) : null}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      <td
+                        className={`px-5 py-3.5 text-right font-semibold tabular-nums ${
+                          stock <= 0
+                            ? "text-red-300"
+                            : stock <= LOW_STOCK_AT
+                              ? "text-amber-300"
+                              : "text-white"
+                        }`}
+                      >
+                        {stock}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        {p.isActive ? (
+                          <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-200 ring-1 ring-emerald-400/30">
+                            Active
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] font-semibold text-slate-300 ring-1 ring-white/15">
+                            Inactive
+                          </span>
+                        )}
+                      </td>
+                      {canManage && (
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center justify-end gap-2">
+                            <EditProduct
+                              product={{
+                                id: p.id,
+                                name: p.name,
+                                sku: p.sku,
+                                priceMinor: Number(p.priceMinor),
+                              }}
+                            />
+                            <form action={toggleProductActiveAction}>
+                              <input type="hidden" name="productId" value={p.id} />
+                              <input type="hidden" name="active" value={String(!p.isActive)} />
+                              <button
+                                type="submit"
+                                className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
+                              >
+                                {p.isActive ? "Deactivate" : "Activate"}
+                              </button>
+                            </form>
+                            <DeleteProductButton productId={p.id} productName={p.name} />
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

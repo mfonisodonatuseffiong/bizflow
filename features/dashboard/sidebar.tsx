@@ -51,13 +51,19 @@ export function Sidebar({
     href === "/dashboard" ? pathname === href : pathname.startsWith(href);
 
   return (
-    <aside className="relative hidden w-64 shrink-0 flex-col overflow-hidden border-r border-white/10 bg-slate-950 text-slate-300 md:flex">
-      <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-brand-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-20 -right-16 h-56 w-56 rounded-full bg-teal-400/10 blur-3xl" />
+    <aside className="relative hidden w-64 shrink-0 flex-col overflow-hidden border-r border-white/10 bg-surface text-slate-300 md:flex">
+      {/* Soft glows: coral top-left, navy bottom-right */}
+      <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-accent-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-20 -right-16 h-56 w-56 rounded-full bg-card/60 blur-3xl" />
 
       <div className="relative flex items-center gap-3 border-b border-white/10 px-5 py-5">
         <Logo size={34} />
         <Wordmark className="text-lg" />
+        {/* Coral-to-orange line under the logo area */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-linear-to-r from-accent-500 via-orange-400 to-transparent"
+        />
       </div>
 
       <nav className="relative flex-1 space-y-1 overflow-y-auto p-3">
@@ -79,14 +85,20 @@ export function Sidebar({
               href={item.href}
               className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                 isActive(item.href)
-                  ? "bg-brand-500/15 text-white ring-1 ring-brand-400/30"
+                  ? "bg-accent-500/15 text-white ring-1 ring-accent-500/40"
                   : "text-slate-300 hover:bg-white/5 hover:text-white"
               }`}
             >
               {isActive(item.href) ? (
-                <span className="absolute -left-3 top-2 bottom-2 w-1 rounded-r-full bg-brand-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
+                <span className="absolute -left-3 top-2 bottom-2 w-1 rounded-r-full bg-accent-500 shadow-[0_0_12px_rgba(231,76,60,0.8)]" />
               ) : null}
-              <span className={isActive(item.href) ? "text-brand-400" : ""}>
+              <span
+                className={
+                  isActive(item.href)
+                    ? "text-accent-500"
+                    : "transition group-hover:text-accent-400"
+                }
+              >
                 <Icon name={item.icon} />
               </span>
               {item.label}
@@ -95,13 +107,19 @@ export function Sidebar({
         )}
       </nav>
 
-      <div className="relative m-3 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 backdrop-blur">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-brand-400 to-teal-500 text-sm font-bold text-slate-950">
+      <div className="relative m-3 flex items-center gap-3 overflow-hidden rounded-2xl border border-white/10 bg-card p-3 shadow-lg shadow-black/30 transition hover:border-accent-500/50">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-accent-600 via-accent-500 to-orange-400"
+        />
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-accent-500 to-orange-400 text-sm font-bold text-white shadow-[0_0_14px_rgba(231,76,60,0.45)]">
           {businessName.charAt(0).toUpperCase()}
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-white">{businessName}</p>
-          <p className="text-[11px] text-slate-500">Your workspace</p>
+          <p className="truncate text-sm font-medium text-white">
+            {businessName}
+          </p>
+          <p className="text-[11px] text-slate-300">Your workspace</p>
         </div>
       </div>
     </aside>

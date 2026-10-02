@@ -18,7 +18,7 @@ export const getCurrentUser = cache(async () => {
         select: {
           role: true,
           business: {
-            select: { id: true, name: true, type: true, currency: true },
+            select: { id: true, name: true, type: true, currency: true, timezone: true },
           },
         },
       },

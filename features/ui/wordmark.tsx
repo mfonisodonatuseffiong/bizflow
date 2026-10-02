@@ -14,14 +14,14 @@ export function Wordmark({
       className={`${display.className} relative inline-block font-extrabold tracking-tighter ${className}`}
     >
       <span className="text-white">Biz</span>
-      <span className="bf-shimmer bg-linear-to-r from-brand-400 via-teal-200 to-brand-400 bg-clip-text text-transparent">
+      <span className="bf-shimmer bg-linear-to-r from-[#023b6d] via-[#3d7ab5] to-[#023b6d] bg-clip-text text-transparent">
         Flow
       </span>
       {wave ? (
         <svg
           viewBox="0 0 200 12"
           preserveAspectRatio="none"
-          className="absolute -bottom-3 left-0 h-3 w-full text-brand-400"
+          className="absolute -bottom-3 left-0 h-3 w-full text-[#3d7ab5]"
           fill="none"
           aria-hidden="true"
         >

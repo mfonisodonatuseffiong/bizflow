@@ -24,17 +24,17 @@ export type NavItem = {
 const dashboard: NavItem = { label: "Dashboard", href: "/dashboard", icon: "dashboard" };
 
 const shared: NavItem[] = [
-  { label: "Customers", href: "/dashboard/customers", icon: "customers", soon: true },
-  { label: "Payments", href: "/dashboard/payments", icon: "payments", soon: true },
-  { label: "Expenses", href: "/dashboard/expenses", icon: "expenses", soon: true },
-  { label: "Reports", href: "/dashboard/reports", icon: "reports", soon: true },
-  { label: "Settings", href: "/dashboard/settings", icon: "settings", soon: true },
+  { label: "Customers", href: "/dashboard/customers", icon: "customers" },
+  { label: "Payments", href: "/dashboard/payments", icon: "payments" },
+  { label: "Expenses", href: "/dashboard/expenses", icon: "expenses" },
+  { label: "Reports", href: "/dashboard/reports", icon: "reports" },
+  { label: "Settings", href: "/dashboard/settings", icon: "settings" },
 ];
 
 const retailCore: NavItem[] = [
   { label: "Products", href: "/dashboard/products", icon: "products" },
-  { label: "Inventory", href: "/dashboard/inventory", icon: "inventory", soon: true },
-  { label: "Sales", href: "/dashboard/sales", icon: "sales", soon: true },
+  { label: "Inventory", href: "/dashboard/inventory", icon: "inventory" },
+  { label: "Sales", href: "/dashboard/sales", icon: "sales" },
 ];
 
 const serviceCore: NavItem[] = [

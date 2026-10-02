@@ -12,3 +12,11 @@ export async function requireBusinessContext() {
 export function canManageCatalog(role: Role) {
   return role === "OWNER" || role === "MANAGER";
 }
+
+export function canManageFinance(role: Role) {
+  return role === "OWNER" || role === "MANAGER";
+}
+
+export function isOwner(role: Role) {
+  return role === "OWNER";
+}

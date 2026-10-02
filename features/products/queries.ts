@@ -2,7 +2,10 @@ import { prisma } from "@/lib/prisma";
 
 export function listProducts(businessId: string) {
   return prisma.product.findMany({
-    where: { businessId },
+    where: {
+      businessId,
+      deletedAt: null, // hide soft-deleted products
+    },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
