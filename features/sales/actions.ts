@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@/app/generated/prisma/client";
 import { revalidatePath } from "next/cache";
 import { requireBusinessContext } from "@/features/auth/context";
 import { prisma } from "@/lib/prisma";
@@ -13,6 +14,19 @@ const fail = (message: string): SaleFormState => ({ status: "error", message });
 const METHODS = ["CASH", "TRANSFER", "MOBILE_MONEY"] as const;
 type Method = (typeof METHODS)[number];
 const MONEY = /^\d{1,9}(\.\d{1,2})?$/;
+
+// Retries when Postgres aborts a Serializable transaction because two
+// sales touched the same stock at the same time (Prisma code P2034).
+async function runSerializable<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+  for (let i = 1; ; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      const conflict = typeof e === "object" && e && "code" in e && e.code === "P2034";
+      if (!conflict || i >= attempts) throw e;
+    }
+  }
+}
 
 export async function createSaleAction(
   _previous: SaleFormState,
@@ -54,78 +68,90 @@ export async function createSaleAction(
   }
 
   try {
-    const error = await prisma.$transaction(async (tx) => {
-      const products = await tx.product.findMany({
-        where: { id: { in: ids }, businessId: business.id, isActive: true },
-        select: { id: true, name: true, priceMinor: true },
-      });
-      if (products.length !== ids.length) return "One or more products are unavailable.";
+    const error = await runSerializable(() =>
+      prisma.$transaction(
+        async (tx) => {
+          const products = await tx.product.findMany({
+            where: { id: { in: ids }, businessId: business.id, isActive: true },
+            select: { id: true, name: true, priceMinor: true },
+          });
+          if (products.length !== ids.length) return "One or more products are unavailable.";
 
-      const stockRows = await tx.stockMovement.groupBy({
-        by: ["productId"],
-        where: { businessId: business.id, productId: { in: ids } },
-        _sum: { quantity: true },
-      });
-      const stock = new Map(stockRows.map((r) => [r.productId, r._sum.quantity ?? 0]));
+          const stockRows = await tx.stockMovement.groupBy({
+            by: ["productId"],
+            where: { businessId: business.id, productId: { in: ids } },
+            _sum: { quantity: true },
+          });
+          const stock = new Map(stockRows.map((r) => [r.productId, r._sum.quantity ?? 0]));
 
-      let totalMinor = 0;
-      const lines = [];
-      for (const p of products) {
-        const quantity = wanted.get(p.id)!;
-        if ((stock.get(p.id) ?? 0) < quantity) {
-          return `Not enough stock for ${p.name} (${stock.get(p.id) ?? 0} left).`;
-        }
-        totalMinor += Number(p.priceMinor) * quantity;
-        lines.push({
-          productId: p.id,
-          productName: p.name,
-          quantity,
-          unitPriceMinor: Number(p.priceMinor),
-        });
-      }
+          let totalMinor = 0;
+          const lines = [];
+          for (const p of products) {
+            const quantity = wanted.get(p.id)!;
+            if ((stock.get(p.id) ?? 0) < quantity) {
+              return `Not enough stock for ${p.name} (${stock.get(p.id) ?? 0} left).`;
+            }
+            totalMinor += Number(p.priceMinor) * quantity;
+            lines.push({
+              productId: p.id,
+              productName: p.name,
+              quantity,
+              unitPriceMinor: Number(p.priceMinor),
+            });
+          }
 
-      if (customerId) {
-        const customer = await tx.customer.findFirst({
-          where: { id: customerId, businessId: business.id, isActive: true },
-          select: { id: true },
-        });
-        if (!customer) return "Customer not found.";
-      }
+          if (customerId) {
+            const customer = await tx.customer.findFirst({
+              where: { id: customerId, businessId: business.id, isActive: true },
+              select: { id: true },
+            });
+            if (!customer) return "Customer not found.";
+          }
 
-      // Blank = paid in full.
-      const paidMinor = paidRaw === "" ? totalMinor : Math.round(Number(paidRaw) * 100);
-      if (paidMinor > totalMinor) return "Amount paid is more than the total.";
-      if (!customerId && paidMinor < totalMinor) {
-        return "Select a customer to sell on credit, or take the full amount.";
-      }
+          // Blank = paid in full.
+          const paidMinor = paidRaw === "" ? totalMinor : Math.round(Number(paidRaw) * 100);
+          if (paidMinor > totalMinor) return "Amount paid is more than the total.";
+          if (!customerId && paidMinor < totalMinor) {
+            return "Select a customer to sell on credit, or take the full amount.";
+          }
 
-      const sale = await tx.sale.create({
-        data: {
-          businessId: business.id,
-          customerId,
-          createdById: user.id,
-          totalMinor,
-          items: { create: lines },
-          payments:
-            paidMinor > 0
-              ? { create: { businessId: business.id, amountMinor: paidMinor, method, createdById: user.id } }
-              : undefined,
+          const sale = await tx.sale.create({
+            data: {
+              businessId: business.id,
+              customerId,
+              createdById: user.id,
+              totalMinor,
+              items: { create: lines },
+              payments:
+                paidMinor > 0
+                  ? {
+                      create: {
+                        businessId: business.id,
+                        amountMinor: paidMinor,
+                        method,
+                        createdById: user.id,
+                      },
+                    }
+                  : undefined,
+            },
+            select: { id: true },
+          });
+
+          await tx.stockMovement.createMany({
+            data: lines.map((l) => ({
+              businessId: business.id,
+              productId: l.productId,
+              type: "SALE" as const,
+              quantity: -l.quantity,
+              note: `Sale ${sale.id.slice(-6)}`,
+              createdById: user.id,
+            })),
+          });
+          return null;
         },
-        select: { id: true },
-      });
-
-      await tx.stockMovement.createMany({
-        data: lines.map((l) => ({
-          businessId: business.id,
-          productId: l.productId,
-          type: "SALE" as const,
-          quantity: -l.quantity,
-          note: `Sale ${sale.id.slice(-6)}`,
-          createdById: user.id,
-        })),
-      });
-      return null;
-    });
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      ),
+    );
     if (error) return fail(error);
   } catch (e) {
     console.error("createSaleAction failed", e);
