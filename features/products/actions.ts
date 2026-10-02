@@ -90,6 +90,7 @@ export async function createProductAction(
   }
 
   revalidatePath("/dashboard/products");
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard/inventory");
   return { status: "success", message: "Product added." };
 }
@@ -166,6 +167,7 @@ export async function updateProductAction(
   }
 
   revalidatePath("/dashboard/products");
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard/inventory");
   return { status: "success", message: "Product updated." };
 }
@@ -187,6 +189,7 @@ export async function toggleProductActiveAction(formData: FormData): Promise<voi
   });
 
   revalidatePath("/dashboard/products");
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard/inventory");
   revalidatePath("/dashboard/sales");
 }
@@ -225,6 +228,7 @@ export async function deleteProductWithStatusAction(
   }
 
   revalidatePath("/dashboard/products");
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard/inventory");
   revalidatePath("/dashboard/sales");
   return { status: "success", message: "Product deleted." };

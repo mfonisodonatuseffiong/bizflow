@@ -66,5 +66,6 @@ export async function adjustStockAction(
 
   revalidatePath("/dashboard/inventory");
   revalidatePath("/dashboard/products");
+  revalidatePath("/dashboard");
   return { status: "success", message: "Stock updated." };
 }
