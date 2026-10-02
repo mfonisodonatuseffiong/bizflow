@@ -1,22 +1,40 @@
 "use client";
 
-import { startTransition, useActionState, useEffect, useRef } from "react";
+import { startTransition, useActionState, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { createProductAction, type ProductFormState } from "@/features/products/actions";
+import { createCategoryAction } from "@/features/categories/actions";
 
 const inputClass =
   "block w-full rounded-xl border border-white/15 bg-brand-700/60 px-3.5 py-2.5 text-base text-white shadow-sm placeholder:text-slate-500 transition focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40 sm:text-sm";
 
 const labelClass = "mb-1.5 block text-sm font-medium text-slate-200";
 
-export function ProductForm({ currency }: { currency: string }) {
+type CategoryOption = { id: string; name: string };
+
+export function ProductForm({
+  currency,
+  categories,
+}: {
+  currency: string;
+  categories: CategoryOption[];
+}) {
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction, pending] = useActionState<ProductFormState, FormData>(
     createProductAction,
     { status: "idle" },
   );
 
+  const [categoryId, setCategoryId] = useState("");
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [creatingCategory, setCreatingCategory] = useState(false);
+
   useEffect(() => {
-    if (state.status === "success") formRef.current?.reset();
+    if (state.status === "success") {
+      formRef.current?.reset();
+      setCategoryId("");
+    }
   }, [state]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -24,6 +42,28 @@ export function ProductForm({ currency }: { currency: string }) {
     if (pending) return; // ignore clicks while a save is in flight
     const data = new FormData(event.currentTarget);
     startTransition(() => formAction(data));
+  }
+
+  function handleAddCategory() {
+    if (creatingCategory) return;
+    setCreatingCategory(true);
+    startTransition(async () => {
+      try {
+        const result = await createCategoryAction(newCategory);
+        if (result.status === "success") {
+          toast.success(`Category “${newCategory.trim()}” added.`);
+          setCategoryId(result.id);
+          setNewCategory("");
+          setShowNewCategory(false);
+        } else {
+          toast.error(result.message);
+        }
+      } catch {
+        toast.error("Could not add the category. Please try again.");
+      } finally {
+        setCreatingCategory(false);
+      }
+    });
   }
 
   return (
@@ -46,7 +86,7 @@ export function ProductForm({ currency }: { currency: string }) {
       <div className="relative">
         <h2 className="text-base font-semibold text-white">Add a product</h2>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <label htmlFor="name" className={labelClass}>
               Name
@@ -70,6 +110,32 @@ export function ProductForm({ currency }: { currency: string }) {
               placeholder="e.g. NOOD-070"
               className={inputClass}
             />
+          </div>
+          <div>
+            <label htmlFor="categoryId" className={labelClass}>
+              Category (optional)
+            </label>
+            <select
+              id="categoryId"
+              name="categoryId"
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">No category</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => setShowNewCategory((v) => !v)}
+              className="mt-1.5 text-xs font-medium text-accent-500 hover:underline"
+            >
+              {showNewCategory ? "Cancel" : "+ New category"}
+            </button>
           </div>
           <div>
             <label htmlFor="price" className={labelClass}>
@@ -97,6 +163,31 @@ export function ProductForm({ currency }: { currency: string }) {
             />
           </div>
         </div>
+
+        {showNewCategory && (
+          <div className="mt-4 flex flex-col gap-2 sm:max-w-md sm:flex-row">
+            <input
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleAddCategory();
+                }
+              }}
+              placeholder="New category name, e.g. Noodles"
+              className={inputClass}
+            />
+            <button
+              type="button"
+              onClick={handleAddCategory}
+              disabled={creatingCategory || newCategory.trim().length < 2}
+              className="rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-white/5 disabled:opacity-50"
+            >
+              {creatingCategory ? "Adding..." : "Add category"}
+            </button>
+          </div>
+        )}
 
         {state.status === "error" ? (
           <div

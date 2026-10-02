@@ -34,6 +34,16 @@ export async function createProductAction(
     return { status: "error", message: parsed.error.issues[0]?.message ?? "Check the form." };
   }
 
+  // Optional category. It must belong to this business.
+  const categoryId = String(formData.get("categoryId") ?? "") || null;
+  if (categoryId) {
+    const category = await prisma.category.findFirst({
+      where: { id: categoryId, businessId: business.id },
+      select: { id: true },
+    });
+    if (!category) return { status: "error", message: "Category not found." };
+  }
+
   // Block duplicate product names (case-insensitive) within this business.
   // Soft-deleted products are ignored so the name can be reused.
   const existing = await prisma.product.findFirst({
@@ -52,6 +62,7 @@ export async function createProductAction(
     await prisma.product.create({
       data: {
         businessId: business.id,
+        categoryId,
         name: parsed.data.name,
         sku: parsed.data.sku || null, // empty string → null
         priceMinor: parsed.data.price,
@@ -102,6 +113,19 @@ export async function updateProductAction(
     return { status: "error", message: parsed.error.issues[0]?.message ?? "Check the form." };
   }
 
+  // Optional category. If the form has no category field at all, leave the
+  // product's current category unchanged (undefined = don't touch it).
+  const categoryId = formData.has("categoryId")
+    ? String(formData.get("categoryId") ?? "") || null
+    : undefined;
+  if (categoryId) {
+    const category = await prisma.category.findFirst({
+      where: { id: categoryId, businessId: business.id },
+      select: { id: true },
+    });
+    if (!category) return { status: "error", message: "Category not found." };
+  }
+
   // Confirm the product belongs to this business and is not already deleted.
   const product = await prisma.product.findFirst({
     where: { id: productId, businessId: business.id, deletedAt: null },
@@ -127,6 +151,7 @@ export async function updateProductAction(
     await prisma.product.update({
       where: { id: product.id },
       data: {
+        categoryId,
         name: parsed.data.name,
         sku: parsed.data.sku || null, // empty string → null
         priceMinor: parsed.data.price,

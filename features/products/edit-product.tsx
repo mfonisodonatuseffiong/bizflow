@@ -8,8 +8,16 @@ const inputClass =
 
 export function EditProduct({
   product,
+  categories,
 }: {
-  product: { id: string; name: string; sku: string | null; priceMinor: number };
+  product: {
+    id: string;
+    name: string;
+    sku: string | null;
+    priceMinor: number;
+    categoryId: string | null;
+  };
+  categories: { id: string; name: string }[];
 }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const [state, formAction, pending] = useActionState<ProductFormState, FormData>(
@@ -40,6 +48,18 @@ export function EditProduct({
         <input type="hidden" name="productId" value={product.id} />
         <input name="name" required minLength={2} defaultValue={product.name} placeholder="Name" className={inputClass} />
         <input name="sku" defaultValue={product.sku ?? ""} placeholder="SKU (optional)" className={inputClass} />
+        <select
+          name="categoryId"
+          defaultValue={product.categoryId ?? ""}
+          className={inputClass}
+        >
+          <option value="">No category</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
         <input
           name="price"
           required

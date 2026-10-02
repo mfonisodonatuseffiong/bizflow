@@ -17,12 +17,17 @@ function formatPrice(priceMinor: number | bigint, currency: string) {
 
 export default async function ProductsPage() {
   const { business, role } = await requireBusinessContext();
-  const [products, totals] = await Promise.all([
+  const [products, totals, categories] = await Promise.all([
     listProducts(business.id),
     prisma.stockMovement.groupBy({
       by: ["productId"],
       where: { businessId: business.id },
       _sum: { quantity: true },
+    }),
+    prisma.category.findMany({
+      where: { businessId: business.id },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
     }),
   ]);
   const stockById = new Map(totals.map((t) => [t.productId, t._sum.quantity ?? 0]));
@@ -42,7 +47,7 @@ export default async function ProductsPage() {
       </div>
 
       {canManage ? (
-        <ProductForm currency={business.currency} />
+        <ProductForm currency={business.currency} categories={categories} />
       ) : (
         <p className="rounded-xl border border-white/10 bg-card/60 px-4 py-3 text-sm text-slate-300">
           Only owners and managers can add products.
@@ -114,11 +119,13 @@ export default async function ProductsPage() {
                         <td className="px-5 py-3.5">
                           <div className="flex items-center justify-end gap-2">
                             <EditProduct
+                              categories={categories}
                               product={{
                                 id: p.id,
                                 name: p.name,
                                 sku: p.sku,
                                 priceMinor: Number(p.priceMinor),
+                                categoryId: p.categoryId,
                               }}
                             />
                             <form action={toggleProductActiveAction}>

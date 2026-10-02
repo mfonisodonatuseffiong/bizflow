@@ -13,6 +13,7 @@ export function listProducts(businessId: string) {
       sku: true,
       priceMinor: true,
       isActive: true,
+      categoryId: true,
       category: { select: { name: true } },
     },
   });
