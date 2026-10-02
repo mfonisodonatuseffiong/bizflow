@@ -133,6 +133,7 @@ export async function createSaleAction(
   }
 
   revalidatePath("/dashboard/sales");
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard/products");
   revalidatePath("/dashboard/inventory");
   revalidatePath("/dashboard/customers");
