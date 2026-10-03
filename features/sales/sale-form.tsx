@@ -22,6 +22,8 @@ export function SaleForm({
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const nextKey = useRef(2);
+  // Blocks a second submit in the same instant, before `pending` re-renders.
+  const submitting = useRef(false);
   const [lines, setLines] = useState<Line[]>([{ key: 1, productId: "", quantity: "1" }]);
   const [state, formAction, pending] = useActionState<SaleFormState, FormData>(
     createSaleAction,
@@ -29,6 +31,8 @@ export function SaleForm({
   );
 
   useEffect(() => {
+    // A result came back (success or error), so allow the next submit.
+    submitting.current = false;
     if (state.status === "success") {
       formRef.current?.reset();
       setLines([{ key: nextKey.current++, productId: "", quantity: "1" }]);
@@ -50,7 +54,8 @@ export function SaleForm({
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending) return;
+    if (pending || submitting.current) return;
+    submitting.current = true;
     const data = new FormData(event.currentTarget);
     data.set(
       "cart",
