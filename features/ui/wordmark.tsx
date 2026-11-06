@@ -5,23 +5,27 @@ const display = Unbounded({ subsets: ["latin"], display: "swap" });
 export function Wordmark({
   className = "",
   wave = false,
+  tone = "light",
 }: {
   className?: string;
   wave?: boolean;
+  tone?: "light" | "dark";
 }) {
   return (
     <span
       className={`${display.className} relative inline-block font-extrabold tracking-tighter ${className}`}
     >
-      <span className="text-white">Biz</span>
-      <span className="bf-shimmer bg-linear-to-r from-[#023b6d] via-[#3d7ab5] to-[#023b6d] bg-clip-text text-transparent">
+      <span className={tone === "dark" ? "text-indigo-900" : "text-white"}>
+        Biz
+      </span>
+      <span className="bf-shimmer bg-linear-to-r from-fuchsia-500 via-orange-400 to-fuchsia-500 bg-clip-text text-transparent">
         Flow
       </span>
       {wave ? (
         <svg
           viewBox="0 0 200 12"
           preserveAspectRatio="none"
-          className="absolute -bottom-3 left-0 h-3 w-full text-[#3d7ab5]"
+          className="absolute -bottom-3 left-0 h-3 w-full text-fuchsia-500"
           fill="none"
           aria-hidden="true"
         >

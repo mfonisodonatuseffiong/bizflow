@@ -5,9 +5,16 @@ import OnboardingForm from "./onboarding-form";
 
 export const metadata = { title: "Set up your business | BizFlow" };
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ new?: string }>;
+}) {
   const user = await requireUser();
-  if (user.memberships.length > 0) redirect("/dashboard");
+  const { new: isNew } = await searchParams;
+
+  // Users who already have a business only get here via "Create another business".
+  if (user.memberships.length > 0 && isNew !== "1") redirect("/dashboard");
 
   return (
     <AuthLayout>

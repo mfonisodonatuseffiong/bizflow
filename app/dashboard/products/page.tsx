@@ -36,10 +36,10 @@ export default async function ProductsPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div>
-        <h1 className="bg-linear-to-r from-white via-accent-500 to-orange-300 bg-clip-text text-2xl font-semibold tracking-tight text-transparent sm:text-3xl">
+        <h1 className="bg-linear-to-r from-indigo-700 via-fuchsia-600 to-orange-500 bg-clip-text text-2xl font-semibold tracking-tight text-transparent sm:text-3xl">
           Products
         </h1>
-        <p className="mt-1 text-sm text-slate-300">
+        <p className="mt-1 text-sm text-indigo-800/70">
           {products.length === 0
             ? "No products yet."
             : `${products.length} ${products.length === 1 ? "product" : "products"} in ${business.name}`}
@@ -49,68 +49,68 @@ export default async function ProductsPage() {
       {canManage ? (
         <ProductForm currency={business.currency} categories={categories} />
       ) : (
-        <p className="rounded-xl border border-white/10 bg-card/60 px-4 py-3 text-sm text-slate-300">
+        <p className="rounded-xl border border-white/70 bg-white/45 px-4 py-3 text-sm text-indigo-800/80 backdrop-blur-xl">
           Only owners and managers can add products.
         </p>
       )}
 
       {products.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-accent-500/40 bg-card/60 px-6 py-12 text-center">
-          <p className="text-sm font-semibold text-white">Nothing here yet</p>
-          <p className="mt-1 text-sm text-slate-300">
+        <div className="rounded-2xl border border-dashed border-indigo-900/25 bg-white/35 px-6 py-12 text-center backdrop-blur-xl">
+          <p className="text-sm font-semibold text-indigo-900">Nothing here yet</p>
+          <p className="mt-1 text-sm text-indigo-800/70">
             {canManage
               ? "Add your first product with the form above."
               : "Products will appear here once an owner or manager adds them."}
           </p>
         </div>
       ) : (
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-card shadow-xl shadow-black/30">
+        <div className="relative overflow-hidden rounded-2xl border border-white/70 bg-white/45 shadow-[0_10px_35px_rgba(124,58,237,0.18),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-linear-to-r from-accent-600 via-accent-500 to-orange-400"
+            className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-linear-to-r from-orange-400 via-fuchsia-500 to-indigo-500"
           />
           <div className="overflow-x-auto pt-1 pb-16">
-            <table className="w-full min-w-[40rem] text-left text-sm">
+            <table className="w-full min-w-[40rem] text-left text-sm text-indigo-900">
               <thead>
-                <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-300">
-                  <th className="px-5 py-3 font-medium">Name</th>
-                  <th className="px-5 py-3 font-medium">SKU</th>
-                  <th className="px-5 py-3 font-medium">Category</th>
-                  <th className="px-5 py-3 text-right font-medium">Price</th>
-                  <th className="px-5 py-3 text-right font-medium">Stock</th>
-                  <th className="px-5 py-3 font-medium">Status</th>
-                  {canManage && <th className="px-5 py-3 text-right font-medium">Actions</th>}
+                <tr className="border-b border-indigo-900/10 text-xs uppercase tracking-wider text-indigo-800/70">
+                  <th className="px-5 py-3 font-semibold">Name</th>
+                  <th className="px-5 py-3 font-semibold">SKU</th>
+                  <th className="px-5 py-3 font-semibold">Category</th>
+                  <th className="px-5 py-3 text-right font-semibold">Price</th>
+                  <th className="px-5 py-3 text-right font-semibold">Stock</th>
+                  <th className="px-5 py-3 font-semibold">Status</th>
+                  {canManage && <th className="px-5 py-3 text-right font-semibold">Actions</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-indigo-900/10">
                 {products.map((p) => {
                   const stock = stockById.get(p.id) ?? 0;
                   return (
-                    <tr key={p.id} className="transition hover:bg-white/5">
-                      <td className="px-5 py-3.5 font-medium text-white">{p.name}</td>
-                      <td className="px-5 py-3.5 text-slate-300">{p.sku ?? "-"}</td>
-                      <td className="px-5 py-3.5 text-slate-300">{p.category?.name ?? "-"}</td>
-                      <td className="px-5 py-3.5 text-right font-semibold text-white">
+                    <tr key={p.id} className="transition hover:bg-white/50">
+                      <td className="px-5 py-3.5 font-semibold text-indigo-900">{p.name}</td>
+                      <td className="px-5 py-3.5 text-indigo-800/70">{p.sku ?? "-"}</td>
+                      <td className="px-5 py-3.5 text-indigo-800/70">{p.category?.name ?? "-"}</td>
+                      <td className="px-5 py-3.5 text-right font-semibold text-indigo-900">
                         {formatPrice(p.priceMinor, business.currency)}
                       </td>
                       <td
                         className={`px-5 py-3.5 text-right font-semibold tabular-nums ${
                           stock <= 0
-                            ? "text-red-300"
+                            ? "text-red-600"
                             : stock <= LOW_STOCK_AT
-                              ? "text-amber-300"
-                              : "text-white"
+                              ? "text-orange-600"
+                              : "text-indigo-900"
                         }`}
                       >
                         {stock}
                       </td>
                       <td className="px-5 py-3.5">
                         {p.isActive ? (
-                          <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-200 ring-1 ring-emerald-400/30">
+                          <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-500/40">
                             Active
                           </span>
                         ) : (
-                          <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] font-semibold text-slate-300 ring-1 ring-white/15">
+                          <span className="rounded-full bg-indigo-900/10 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-800/70 ring-1 ring-indigo-900/20">
                             Inactive
                           </span>
                         )}
@@ -133,7 +133,7 @@ export default async function ProductsPage() {
                               <input type="hidden" name="active" value={String(!p.isActive)} />
                               <button
                                 type="submit"
-                                className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
+                                className="rounded-lg border border-white/80 bg-white/60 px-3 py-1.5 text-xs font-semibold text-indigo-900 shadow-sm transition hover:border-fuchsia-400/60 hover:bg-white/85 hover:text-fuchsia-700"
                               >
                                 {p.isActive ? "Deactivate" : "Activate"}
                               </button>

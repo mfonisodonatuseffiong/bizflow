@@ -23,19 +23,19 @@ export function Header({
     .toUpperCase();
 
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-white/10 bg-surface/85 px-4 py-3 shadow-lg shadow-black/20 backdrop-blur-xl sm:px-6">
-      {/* Coral-to-orange line along the bottom edge */}
+    <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-white/70 bg-white/40 px-4 py-3 text-indigo-900 shadow-[0_8px_30px_rgba(124,58,237,0.12)] backdrop-blur-2xl sm:px-6">
+      {/* Orange-to-fuchsia-to-indigo line along the bottom edge */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-linear-to-r from-transparent via-accent-500 to-orange-400"
+        className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-linear-to-r from-transparent via-fuchsia-500 to-orange-400"
       />
 
       <div className="flex min-w-0 items-center gap-3">
         {menu}
-        <h2 className="truncate text-sm font-semibold text-white">
+        <h2 className="truncate text-sm font-semibold text-indigo-900">
           {businessName}
         </h2>
-        <span className="rounded-full bg-accent-500/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent-400 ring-1 ring-accent-500/40">
+        <span className="rounded-full bg-fuchsia-500/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fuchsia-700 ring-1 ring-fuchsia-500/40">
           {role}
         </span>
       </div>
@@ -46,7 +46,7 @@ export function Header({
           disabled
           title="No notifications yet"
           aria-label="Notifications"
-          className="cursor-not-allowed rounded-xl border border-white/10 bg-white/5 p-2 text-slate-500"
+          className="cursor-not-allowed rounded-xl border border-white/80 bg-white/50 p-2 text-indigo-800/40"
         >
           <svg
             viewBox="0 0 24 24"
@@ -62,15 +62,15 @@ export function Header({
           </svg>
         </button>
 
-        <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-card py-1.5 pl-1.5 pr-1.5 shadow-md shadow-black/20 transition hover:border-accent-500/50 sm:pr-4">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-linear-to-br from-accent-500 to-orange-400 text-xs font-bold text-white shadow-[0_0_14px_rgba(231,76,60,0.45)]">
+        <div className="flex items-center gap-3 rounded-2xl border border-white/80 bg-white/55 py-1.5 pl-1.5 pr-1.5 shadow-[0_8px_24px_rgba(124,58,237,0.15)] backdrop-blur-xl transition hover:border-fuchsia-400/60 hover:bg-white/75 sm:pr-4">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-linear-to-br from-orange-400 to-pink-500 text-xs font-bold text-white shadow-[0_6px_16px_rgba(244,114,182,0.5)]">
             {initials}
           </span>
           <div className="hidden text-left sm:block">
-            <p className="text-sm font-medium leading-tight text-white">
+            <p className="text-sm font-semibold leading-tight text-indigo-900">
               {userName}
             </p>
-            <p className="text-[11px] leading-tight text-slate-300">
+            <p className="text-[11px] leading-tight text-indigo-800/70">
               {userEmail}
             </p>
           </div>

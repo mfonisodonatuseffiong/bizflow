@@ -187,15 +187,59 @@ body {
   }
 }
 
-/* Dropdown lists must be solid, not see-through, or they render white. */
+/* CHANGED: dropdown lists are now light, to match the glass pages.
+   They stay solid (not see-through) so they never render white-on-white. */
 select {
-  color-scheme: dark;
+  color-scheme: light;
 }
 select option,
 select optgroup {
-  background-color: #012847;
-  color: #ffffff;
+  background-color: #fdf2f8;
+  color: #312e81;
 }
 select option:disabled {
-  color: #94a3b8;
+  color: #6366f1;
+}
+
+@keyframes bf-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(40px, -30px, 0) scale(1.15); }
+}
+@keyframes bf-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+.bf-drift { animation: bf-drift 14s ease-in-out infinite; }
+.bf-bob { animation: bf-bob 6s ease-in-out infinite; }
+.bf-bob-slow { animation: bf-bob 8s ease-in-out infinite reverse; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bf-drift, .bf-bob, .bf-bob-slow { animation: none; }
+}
+
+/* ADDED: drifting glows and shimmer text used by the landing page,
+   the auth pages and the loading screen. */
+@keyframes bf-drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(8vw, 6vh) scale(1.15); }
+}
+@keyframes bf-drift-b {
+  0%, 100% { transform: translate(0, 0) scale(1.1); }
+  50% { transform: translate(-7vw, 8vh) scale(0.95); }
+}
+@keyframes bf-drift-c {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(5vw, -7vh) scale(1.2); }
+}
+.bf-blob-a { animation: bf-drift-a 20s ease-in-out infinite; }
+.bf-blob-b { animation: bf-drift-b 24s ease-in-out infinite; }
+.bf-blob-c { animation: bf-drift-c 28s ease-in-out infinite; }
+.bf-shimmer-text {
+  background-size: 200% auto;
+  animation: bf-shimmer 6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bf-blob-a, .bf-blob-b, .bf-blob-c, .bf-shimmer-text { animation: none; }
+  .bf-shimmer-text { background-size: 100% auto; }
 }

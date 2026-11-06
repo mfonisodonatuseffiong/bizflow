@@ -6,16 +6,38 @@ import { listTeam } from "@/features/settings/queries";
 
 export const metadata: Metadata = { title: "Settings | BizFlow" };
 
-const cardClass =
-  "relative overflow-hidden rounded-2xl border border-white/10 bg-card p-5 shadow-xl shadow-black/30 sm:p-6";
+const join = (parts: string[]) => parts.join(" ");
 
-const topLine =
-  "pointer-events-none absolute inset-x-0 top-0 h-1 bg-linear-to-r from-accent-600 via-accent-500 to-orange-400";
+/* Light glass look, same as the other dashboard pages */
+const cardClass = join([
+  "relative overflow-hidden rounded-2xl border border-white/70",
+  "bg-white/45 p-5 backdrop-blur-xl sm:p-6",
+  "shadow-[0_10px_35px_rgba(124,58,237,0.18),inset_0_1px_0_rgba(255,255,255,0.9)]",
+]);
+
+const topLine = join([
+  "pointer-events-none absolute inset-x-0 top-0 h-1",
+  "bg-linear-to-r from-orange-400 via-fuchsia-500 to-indigo-500",
+]);
+
+const headingClass = join([
+  "bg-linear-to-r from-indigo-700 via-fuchsia-600 to-orange-500",
+  "bg-clip-text text-2xl font-semibold tracking-tight",
+  "text-transparent sm:text-3xl",
+]);
+
+const labelClass = "text-xs font-semibold uppercase tracking-wider text-indigo-800/70";
+
+const avatarClass = join([
+  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+  "bg-linear-to-br from-orange-400 to-pink-500 text-sm font-bold text-white",
+  "shadow-[0_6px_16px_rgba(244,114,182,0.5)]",
+]);
 
 const roleStyles: Record<string, string> = {
-  OWNER: "bg-accent-500/15 text-accent-400 ring-accent-500/40",
-  MANAGER: "bg-orange-400/15 text-orange-300 ring-orange-400/40",
-  STAFF: "bg-white/10 text-slate-300 ring-white/15",
+  OWNER: "bg-fuchsia-500/15 text-fuchsia-700 ring-fuchsia-500/40",
+  MANAGER: "bg-orange-500/15 text-orange-700 ring-orange-500/40",
+  STAFF: "bg-indigo-900/10 text-indigo-800/80 ring-indigo-900/20",
 };
 
 export default async function SettingsPage() {
@@ -32,30 +54,28 @@ export default async function SettingsPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6 text-indigo-900">
       <div>
-        <h1 className="bg-linear-to-r from-white via-accent-500 to-orange-300 bg-clip-text text-2xl font-semibold tracking-tight text-transparent sm:text-3xl">
-          Settings
-        </h1>
-        <p className="mt-1 text-sm text-slate-300">
+        <h1 className={headingClass}>Settings</h1>
+        <p className="mt-1 text-sm text-indigo-800/70">
           Manage your business and see your team.
         </p>
       </div>
 
       <section className={cardClass}>
         <span aria-hidden="true" className={topLine} />
-        <h2 className="text-base font-semibold text-white">Business</h2>
+        <h2 className="text-base font-semibold text-indigo-900">Business</h2>
 
         <div className="mt-4">
           {isOwner(role) ? (
             <BusinessNameForm name={business.name} />
           ) : (
             <div>
-              <p className="text-xs uppercase tracking-wider text-slate-400">
-                Business name
+              <p className={labelClass}>Business name</p>
+              <p className="mt-1 text-sm font-semibold text-indigo-900">
+                {business.name}
               </p>
-              <p className="mt-1 text-sm font-medium text-white">{business.name}</p>
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-indigo-800/60">
                 Only the owner can change the business name.
               </p>
             </div>
@@ -65,14 +85,14 @@ export default async function SettingsPage() {
         <dl className="mt-6 grid gap-4 sm:grid-cols-2">
           {details.map((d) => (
             <div key={d.label}>
-              <dt className="text-xs uppercase tracking-wider text-slate-400">
-                {d.label}
-              </dt>
-              <dd className="mt-1 text-sm font-medium text-white">{d.value}</dd>
+              <dt className={labelClass}>{d.label}</dt>
+              <dd className="mt-1 text-sm font-semibold text-indigo-900">
+                {d.value}
+              </dd>
             </div>
           ))}
         </dl>
-        <p className="mt-4 text-xs text-slate-400">
+        <p className="mt-4 text-xs text-indigo-800/60">
           Country, currency and timezone are fixed after setup, because
           existing prices and records use this currency.
         </p>
@@ -80,33 +100,35 @@ export default async function SettingsPage() {
 
       <section className={cardClass}>
         <span aria-hidden="true" className={topLine} />
-        <h2 className="text-base font-semibold text-white">Team</h2>
-        <p className="mt-1 text-xs text-slate-400">
+        <h2 className="text-base font-semibold text-indigo-900">Team</h2>
+        <p className="mt-1 text-xs text-indigo-800/60">
           {team.length} {team.length === 1 ? "member" : "members"}. Inviting
           people is a later step.
         </p>
 
-        <ul className="mt-4 divide-y divide-white/5">
+        <ul className="mt-4 divide-y divide-indigo-900/10">
           {team.map((m) => (
             <li key={m.id} className="flex items-center justify-between gap-3 py-3">
               <div className="flex min-w-0 items-center gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-accent-500 to-orange-400 text-sm font-bold text-white">
+                <span className={avatarClass}>
                   {m.user.name.charAt(0).toUpperCase()}
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-white">
+                  <p className="truncate text-sm font-semibold text-indigo-900">
                     {m.user.name}
                     {m.userId === user.id ? (
-                      <span className="ml-2 text-xs font-normal text-slate-400">
+                      <span className="ml-2 text-xs font-normal text-indigo-800/60">
                         (you)
                       </span>
                     ) : null}
                   </p>
-                  <p className="truncate text-xs text-slate-300">{m.user.email}</p>
+                  <p className="truncate text-xs text-indigo-800/70">
+                    {m.user.email}
+                  </p>
                 </div>
               </div>
               <span
-                className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ${
+                className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ring-1 ${
                   roleStyles[m.role] ?? roleStyles.STAFF
                 }`}
               >

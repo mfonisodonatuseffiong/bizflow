@@ -2,10 +2,17 @@
 
 import { startTransition, useActionState, useEffect, useRef } from "react";
 import { adjustStockAction, type StockFormState } from "@/features/inventory/actions";
-
-const inputClass =
-  "block w-full rounded-xl border border-white/15 bg-brand-700/60 px-3.5 py-2.5 text-base text-white placeholder:text-slate-500 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40 sm:text-sm";
-const labelClass = "mb-1.5 block text-sm font-medium text-slate-200";
+import {
+  btnShine,
+  cornerGlow,
+  errorBox,
+  formCard,
+  inputClass,
+  labelClass,
+  okBox,
+  primaryBtn,
+  topLine,
+} from "@/features/ui/glass";
 
 export function AdjustForm({ products }: { products: { id: string; name: string }[] }) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -30,58 +37,90 @@ export function AdjustForm({ products }: { products: { id: string; name: string 
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="grid gap-4 rounded-2xl border border-white/10 bg-card p-5 sm:grid-cols-2"
+      className={`${formCard} grid gap-4 sm:grid-cols-2`}
     >
-      <div className="sm:col-span-2">
+      <span aria-hidden="true" className={topLine} />
+      <span aria-hidden="true" className={cornerGlow} />
+
+      <div className="relative sm:col-span-2">
         <label htmlFor="productId" className={labelClass}>Product</label>
-        <select id="productId" name="productId" required defaultValue="" className={inputClass}>
-          <option value="" disabled className="text-black">Select a product</option>
+        <select
+          id="productId"
+          name="productId"
+          required
+          defaultValue=""
+          className={inputClass}
+        >
+          <option value="" disabled className="text-indigo-900">
+            Select a product
+          </option>
           {products.map((p) => (
-            <option key={p.id} value={p.id} className="text-black">{p.name}</option>
+            <option key={p.id} value={p.id} className="text-indigo-900">
+              {p.name}
+            </option>
           ))}
         </select>
       </div>
 
-      <div>
+      <div className="relative">
         <label htmlFor="kind" className={labelClass}>Change type</label>
-        <select id="kind" name="kind" required defaultValue="RESTOCK" className={inputClass}>
-          <option value="RESTOCK" className="text-black">Restock (add)</option>
-          <option value="ADJUSTMENT" className="text-black">Adjustment (+/-)</option>
+        <select
+          id="kind"
+          name="kind"
+          required
+          defaultValue="RESTOCK"
+          className={inputClass}
+        >
+          <option value="RESTOCK" className="text-indigo-900">Restock (add)</option>
+          <option value="ADJUSTMENT" className="text-indigo-900">
+            Adjustment (+/-)
+          </option>
         </select>
       </div>
 
-      <div>
+      <div className="relative">
         <label htmlFor="quantity" className={labelClass}>Quantity</label>
         <input
-          id="quantity" name="quantity" type="number" step={1} required
-          placeholder="e.g. 24 or -3" className={inputClass}
+          id="quantity"
+          name="quantity"
+          type="number"
+          step={1}
+          required
+          placeholder="e.g. 24 or -3"
+          className={inputClass}
         />
       </div>
 
-      <div className="sm:col-span-2">
+      <div className="relative sm:col-span-2">
         <label htmlFor="note" className={labelClass}>Note (optional)</label>
         <input
-          id="note" name="note" type="text" maxLength={200}
-          placeholder="e.g. Supplier delivery, damaged items" className={inputClass}
+          id="note"
+          name="note"
+          type="text"
+          maxLength={200}
+          placeholder="e.g. Supplier delivery, damaged items"
+          className={inputClass}
         />
       </div>
 
       {state.status === "error" && (
-        <div role="alert" className="rounded-lg border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200 sm:col-span-2">
+        <div role="alert" className={`${errorBox} relative sm:col-span-2`}>
           {state.message}
         </div>
       )}
       {state.status === "success" && (
-        <div role="status" className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200 sm:col-span-2">
+        <div role="status" className={`${okBox} relative sm:col-span-2`}>
           {state.message}
         </div>
       )}
 
       <button
-        type="submit" disabled={pending}
-        className="rounded-xl border border-accent-500/60 bg-accent-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-accent-600 disabled:opacity-60 sm:col-span-2"
+        type="submit"
+        disabled={pending}
+        className={`${primaryBtn} px-4 py-3 sm:col-span-2`}
       >
-        {pending ? "Saving..." : "Update stock"}
+        <span className={btnShine} />
+        <span className="relative">{pending ? "Saving..." : "Update stock"}</span>
       </button>
     </form>
   );

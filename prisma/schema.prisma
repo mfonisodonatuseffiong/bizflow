@@ -152,6 +152,7 @@ model Sale {
   businessId  String
   customerId  String?
   createdById String?
+  requestId   String?
   totalMinor  Int
   createdAt   DateTime @default(now())
 
@@ -160,6 +161,7 @@ model Sale {
   items    SaleItem[]
   payments Payment[]
 
+  @@unique([businessId, requestId])
   @@index([businessId, createdAt])
 }
 

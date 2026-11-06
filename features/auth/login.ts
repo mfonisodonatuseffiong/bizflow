@@ -2,8 +2,10 @@
 
 import argon2 from "argon2";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSession, destroySession } from "@/lib/session";
+import { getSignInMeta, sendSignInAlert } from "@/lib/sign-in-alert";
 
 export type LoginState = { status: "idle" | "error"; message?: string };
 
@@ -25,25 +27,32 @@ export async function loginAction(
     return { status: "error", message: GENERIC_ERROR };
   }
 
-  let userId: string | null = null;
+  let signedIn: { id: string; name: string | null } | null = null;
   try {
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { id: true, passwordHash: true },
+      select: { id: true, name: true, passwordHash: true },
     });
     const valid = await argon2.verify(
       user?.passwordHash ?? (await getDummyHash()),
       password,
     );
-    if (user && valid) userId = user.id;
+    if (user && valid) signedIn = { id: user.id, name: user.name };
   } catch (error) {
     console.error("loginAction failed", error);
     return { status: "error", message: "Something went wrong. Please try again." };
   }
 
-  if (!userId) return { status: "error", message: GENERIC_ERROR };
+  if (!signedIn) return { status: "error", message: GENERIC_ERROR };
 
-  await createSession(userId);
+  await createSession(signedIn.id);
+
+  // Email the user about this sign-in. Runs after the response is sent,
+  // so it never slows down or blocks the login.
+  const meta = await getSignInMeta();
+  const name = signedIn.name;
+  after(() => sendSignInAlert({ email, name }, "password", meta));
+
   redirect("/dashboard");
 }
 

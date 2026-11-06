@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { canManageFinance, requireBusinessContext } from "@/features/auth/context";
 import { expenseCategoryLabel } from "@/features/expenses/categories";
 import { getMonthlyReport } from "@/features/reports/queries";
-import { monthLabel, startOfMonthUtc } from "@/lib/dates";
+import { monthLabel, startOfMonth } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 
 export const metadata: Metadata = { title: "Reports | BizFlow" };
@@ -28,7 +28,7 @@ export default async function ReportsPage() {
     );
   }
 
-  const report = await getMonthlyReport(business.id, startOfMonthUtc());
+  const report = await getMonthlyReport(business.id, startOfMonth(business.timezone));
   const net = report.salesTotal - report.expensesTotal;
   const money = (minor: number) => formatMoney(minor, business.currency);
   const maxCategory = Math.max(
@@ -65,7 +65,7 @@ export default async function ReportsPage() {
       <div>
         <h1 className={titleClass}>Reports</h1>
         <p className="mt-1 text-sm text-slate-300">
-          {business.name} · {monthLabel()} so far
+          {business.name} · {monthLabel(business.timezone)} so far
         </p>
       </div>
 

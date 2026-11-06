@@ -51,18 +51,18 @@ export function Sidebar({
     href === "/dashboard" ? pathname === href : pathname.startsWith(href);
 
   return (
-    <aside className="relative hidden w-64 shrink-0 flex-col overflow-hidden border-r border-white/10 bg-surface text-slate-300 md:flex">
-      {/* Soft glows: coral top-left, navy bottom-right */}
-      <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-accent-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-20 -right-16 h-56 w-56 rounded-full bg-card/60 blur-3xl" />
+    <aside className="relative hidden w-64 shrink-0 flex-col overflow-hidden border-r border-white/70 bg-white/40 text-indigo-900 backdrop-blur-2xl shadow-[8px_0_40px_rgba(124,58,237,0.12)] md:flex">
+      {/* Soft glows: fuchsia top-left, sky bottom-right */}
+      <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-fuchsia-300/50 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-20 -right-16 h-56 w-56 rounded-full bg-sky-300/50 blur-3xl" />
 
-      <div className="relative flex items-center gap-3 border-b border-white/10 px-5 py-5">
+      <div className="relative flex items-center gap-3 border-b border-white/70 px-5 py-5">
         <Logo size={34} />
-        <Wordmark className="text-lg" />
-        {/* Coral-to-orange line under the logo area */}
+        <Wordmark tone="dark" className="text-lg" />
+        {/* Orange-to-fuchsia line under the logo area */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-linear-to-r from-accent-500 via-orange-400 to-transparent"
+          className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-linear-to-r from-orange-400 via-fuchsia-500 to-transparent"
         />
       </div>
 
@@ -71,11 +71,11 @@ export function Sidebar({
           item.soon ? (
             <span
               key={item.href}
-              className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-600"
+              className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-indigo-800/40"
             >
               <Icon name={item.icon} />
               <span className="flex-1">{item.label}</span>
-              <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-medium text-slate-500">
+              <span className="rounded-full bg-white/60 px-2 py-0.5 text-[10px] font-semibold text-indigo-800/60">
                 Soon
               </span>
             </span>
@@ -83,20 +83,20 @@ export function Sidebar({
             <Link
               key={item.href}
               href={item.href}
-              className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+              className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition duration-300 ${
                 isActive(item.href)
-                  ? "bg-accent-500/15 text-white ring-1 ring-accent-500/40"
-                  : "text-slate-300 hover:bg-white/5 hover:text-white"
+                  ? "bg-linear-to-r from-indigo-600 via-violet-600 to-fuchsia-600 text-white shadow-[0_8px_24px_rgba(109,40,217,0.4)] ring-1 ring-white/40"
+                  : "text-indigo-900/80 hover:bg-white/60 hover:text-indigo-900"
               }`}
             >
               {isActive(item.href) ? (
-                <span className="absolute -left-3 top-2 bottom-2 w-1 rounded-r-full bg-accent-500 shadow-[0_0_12px_rgba(231,76,60,0.8)]" />
+                <span className="absolute -left-3 top-2 bottom-2 w-1 rounded-r-full bg-fuchsia-500 shadow-[0_0_12px_rgba(217,70,239,0.8)]" />
               ) : null}
               <span
                 className={
                   isActive(item.href)
-                    ? "text-accent-500"
-                    : "transition group-hover:text-accent-400"
+                    ? "text-white"
+                    : "transition group-hover:text-fuchsia-600"
                 }
               >
                 <Icon name={item.icon} />
@@ -107,19 +107,19 @@ export function Sidebar({
         )}
       </nav>
 
-      <div className="relative m-3 flex items-center gap-3 overflow-hidden rounded-2xl border border-white/10 bg-card p-3 shadow-lg shadow-black/30 transition hover:border-accent-500/50">
+      <div className="relative m-3 flex items-center gap-3 overflow-hidden rounded-2xl border border-white/80 bg-white/55 p-3 shadow-[0_10px_30px_rgba(124,58,237,0.18)] backdrop-blur-xl transition hover:border-fuchsia-400/60 hover:bg-white/75">
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-accent-600 via-accent-500 to-orange-400"
+          className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-orange-400 via-fuchsia-500 to-indigo-500"
         />
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-accent-500 to-orange-400 text-sm font-bold text-white shadow-[0_0_14px_rgba(231,76,60,0.45)]">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-orange-400 to-pink-500 text-sm font-bold text-white shadow-[0_6px_18px_rgba(244,114,182,0.5)]">
           {businessName.charAt(0).toUpperCase()}
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-white">
+          <p className="truncate text-sm font-semibold text-indigo-900">
             {businessName}
           </p>
-          <p className="text-[11px] text-slate-300">Your workspace</p>
+          <p className="text-[11px] text-indigo-800/70">Your workspace</p>
         </div>
       </div>
     </aside>

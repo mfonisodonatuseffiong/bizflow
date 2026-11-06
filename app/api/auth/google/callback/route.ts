@@ -1,15 +1,18 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import type { NextRequest } from "next/server";
+import { after, type NextRequest } from "next/server";
 import { exchangeGoogleCode } from "@/lib/google";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
+import { getSignInMeta, sendSignInAlert } from "@/lib/sign-in-alert";
 
 export const dynamic = "force-dynamic";
 
 async function signInWithGoogle(code: string, verifier: string): Promise<string> {
   const profile = await exchangeGoogleCode(code, verifier);
   if (!profile.email || !profile.emailVerified) return "/login?error=google_unverified";
+
+  const email = profile.email;
 
   const linked = await prisma.account.findUnique({
     where: {
@@ -27,7 +30,7 @@ async function signInWithGoogle(code: string, verifier: string): Promise<string>
     // An existing password account is never auto-linked: its email was
     // never verified, so linking would allow account pre-hijacking.
     const existing = await prisma.user.findUnique({
-      where: { email: profile.email },
+      where: { email },
       select: { id: true },
     });
     if (existing) return "/login?error=google_email_exists";
@@ -35,8 +38,8 @@ async function signInWithGoogle(code: string, verifier: string): Promise<string>
     const user = await prisma.user.create({
       select: { id: true },
       data: {
-        email: profile.email,
-        name: profile.name ?? profile.email.split("@")[0],
+        email,
+        name: profile.name ?? email.split("@")[0],
         accounts: {
           create: { provider: "google", providerAccountId: profile.sub },
         },
@@ -46,6 +49,18 @@ async function signInWithGoogle(code: string, verifier: string): Promise<string>
   }
 
   await createSession(userId);
+
+  // Email the user about this sign-in. Runs after the response is sent,
+  // so it never slows down or blocks the login.
+  const meta = await getSignInMeta();
+  after(() =>
+    sendSignInAlert(
+      { email, name: profile.name ?? email.split("@")[0] },
+      "google",
+      meta,
+    ),
+  );
+
   return "/dashboard";
 }
 

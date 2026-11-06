@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AuthBackground } from "@/features/auth/auth-background";
 import { getCurrentUser } from "@/features/auth/current-user";
 import { Logo } from "@/features/ui/logo";
 import { Reveal } from "@/features/ui/reveal";
@@ -44,11 +43,13 @@ const flows = [
     name: "Retail",
     note: "Supermarkets, mini-marts, fashion, electronics",
     steps: ["Product", "Inventory", "Sale", "Payment", "Receipt"],
+    band: "from-orange-400 via-pink-500 to-fuchsia-500",
   },
   {
     name: "Service",
     note: "Mechanics, electricians, salons, cleaners",
     steps: ["Request", "Quote", "Booking", "Job", "Invoice", "Payment"],
+    band: "from-indigo-500 via-violet-500 to-sky-500",
   },
 ];
 
@@ -74,18 +75,22 @@ const foundations = [
   {
     title: "Separate data per business",
     text: "Every record belongs to one business. Others can never see it.",
+    d: "M12 3c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6",
   },
   {
     title: "Role-based access",
     text: "Owner, manager and staff roles control who can do what.",
+    d: "M16 11a4 4 0 10-8 0 4 4 0 008 0zM4 20a8 8 0 0116 0",
   },
   {
     title: "Secure sign-in",
     text: "Passwords are hashed with Argon2. Sessions use signed, httpOnly cookies.",
+    d: "M6 11h12v9H6zM8 11V8a4 4 0 018 0v3",
   },
   {
     title: "Built for any country",
     text: "Currency and timezone are settings, not assumptions.",
+    d: "M12 3a9 9 0 100 18 9 9 0 000-18zM3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18",
   },
 ];
 
@@ -108,8 +113,12 @@ const faqs = [
   },
 ];
 
-const card =
-  "rounded-2xl border border-white/10 bg-[#023b6d] p-6 shadow-xl shadow-black/30 transition hover:-translate-y-1 hover:border-[#e74c3c]/50 hover:brightness-110";
+const stats = [
+  { value: "6", label: "Countries" },
+  { value: "2", label: "Business types" },
+  { value: "3", label: "Team roles" },
+  { value: "1", label: "Workspace" },
+];
 
 const previewNav = [
   "Dashboard",
@@ -119,43 +128,107 @@ const previewNav = [
   "Customers",
   "Reports",
 ];
-const previewCards = ["Sales today", "Low-stock items", "Customers"];
+const previewCards = ["Sales today", "Low stock", "Customers"];
+
+/* Shared looks (light glass, deep indigo text) */
+const glass =
+  "relative rounded-3xl border border-white/70 bg-white/40 backdrop-blur-2xl shadow-[0_10px_40px_rgba(124,58,237,0.18),inset_0_1px_0_rgba(255,255,255,0.9)]";
+const glassHover =
+  "transition duration-300 hover:-translate-y-1 hover:bg-white/60 hover:shadow-[0_18px_50px_rgba(124,58,237,0.28)]";
+const gradientText =
+  "bg-linear-to-r from-indigo-700 via-fuchsia-600 to-indigo-700 bg-clip-text text-transparent";
+const primaryBtn =
+  "bg-linear-to-r from-indigo-600 via-violet-600 to-fuchsia-600 text-white shadow-[0_10px_30px_rgba(109,40,217,0.45)] ring-1 ring-white/40 transition duration-300 hover:scale-105 hover:shadow-[0_10px_45px_rgba(109,40,217,0.65)]";
+const iconBox =
+  "bg-linear-to-br from-orange-400 to-pink-500 text-white shadow-[0_8px_24px_rgba(244,114,182,0.55)]";
+const sub = "text-indigo-800/80";
+/* Consistent section rhythm: tighter on phones */
+const sectionPad = "pb-16 sm:pb-24 lg:pb-28";
+const h2 =
+  "mt-3 text-center text-2xl font-semibold tracking-tight min-[400px]:text-3xl sm:text-4xl lg:text-5xl";
+
+function Eyebrow({
+  children,
+  center = true,
+}: {
+  children: React.ReactNode;
+  center?: boolean;
+}) {
+  return (
+    <p
+      className={`text-[11px] font-bold uppercase tracking-[0.2em] text-fuchsia-700 sm:text-xs sm:tracking-[0.25em] ${
+        center ? "text-center" : ""
+      }`}
+    >
+      {children}
+    </p>
+  );
+}
+
+function Icon({ d, className = "h-6 w-6" }: { d: string; className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={d} />
+    </svg>
+  );
+}
 
 export default async function HomePage() {
   if (await getCurrentUser()) redirect("/dashboard");
 
   return (
-    <main className="bg-[#021528] text-white">
-      {/* ── Header ── */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#021528]/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-2.5">
-            <Logo size={42} />
-            <Wordmark className="text-lg" />
+    <main className="relative isolate w-full overflow-x-clip bg-pink-200 text-indigo-900">
+      {/* ── Peach sorbet background (fixed behind everything) ── */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-linear-to-br from-orange-200 via-pink-200 to-violet-300"
+      >
+        <div className="bf-blob-a absolute -left-24 -top-24 h-72 w-72 rounded-full bg-yellow-300/70 blur-[80px] sm:-left-32 sm:-top-32 sm:h-[40rem] sm:w-[40rem] sm:blur-[110px]" />
+        <div className="bf-blob-b absolute -right-24 top-1/4 h-64 w-64 rounded-full bg-sky-300/70 blur-[80px] sm:-right-32 sm:h-[38rem] sm:w-[38rem] sm:blur-[110px]" />
+        <div className="bf-blob-c absolute -bottom-24 left-1/4 h-64 w-64 rounded-full bg-fuchsia-300/70 blur-[80px] sm:-bottom-32 sm:h-[36rem] sm:w-[36rem] sm:blur-[110px]" />
+      </div>
+
+      {/* ── Header: floating glass pill ── */}
+      <header className="fixed inset-x-0 top-3 z-50 px-3 sm:top-4 sm:px-4">
+        <div
+          className={`${glass} mx-auto flex h-12 max-w-5xl items-center justify-between gap-2 rounded-full px-3 sm:h-14 sm:px-6`}
+        >
+          <Link href="/" className="flex min-w-0 items-center gap-2">
+            <Logo size={30} />
+            <Wordmark tone="dark" className="text-base sm:text-lg" />
           </Link>
 
-          <nav className="hidden items-center gap-8 text-sm text-slate-300 md:flex">
-            <a href="#features" className="transition hover:text-white">
+          <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
+            <a href="#features" className="transition hover:text-fuchsia-600">
               Features
             </a>
-            <a href="#how" className="transition hover:text-white">
+            <a href="#how" className="transition hover:text-fuchsia-600">
               How it works
             </a>
-            <a href="#faq" className="transition hover:text-white">
+            <a href="#faq" className="transition hover:text-fuchsia-600">
               FAQ
             </a>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1">
             <Link
               href="/login"
-              className="rounded-lg px-3.5 py-2 text-sm font-medium text-slate-200 transition hover:text-white"
+              className="rounded-full px-2.5 py-1.5 text-[13px] font-semibold transition hover:bg-white/60 sm:px-3.5 sm:py-2 sm:text-sm"
             >
               Sign in
             </Link>
             <Link
               href="/register"
-              className="rounded-lg bg-[#e74c3c] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-[#e74c3c]/30 transition hover:bg-[#c0392b]"
+              className={`${primaryBtn} whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] font-semibold sm:px-5 sm:py-2 sm:text-sm`}
             >
               Get started
             </Link>
@@ -163,228 +236,300 @@ export default async function HomePage() {
         </div>
       </header>
 
-      {/* ── Hero ── */}
-      <section className="relative isolate flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-16 text-center">
-        <AuthBackground />
+      {/* ── Hero: text left, layered cards right ── */}
+      <section className="relative mx-auto grid max-w-6xl items-center gap-14 px-5 pb-16 pt-28 sm:gap-20 sm:px-6 sm:pb-20 sm:pt-36 lg:grid-cols-[1fr_1.05fr] lg:pt-44">
+        <div className="text-center lg:text-left">
+          <span
+            className={`${glass} inline-flex max-w-full items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] font-semibold sm:px-4 sm:text-xs`}
+          >
+            <span className="h-2 w-2 shrink-0 rounded-full bg-fuchsia-500 shadow-[0_0_10px_rgba(217,70,239,0.9)]" />
+            <span className="truncate">
+              Multi-tenant · Retail &amp; Service businesses
+            </span>
+          </span>
 
-        {/* Logo */}
-        <div className="bf-float mt-8">
-          <Logo size={72} animated />
+          <h1 className="mt-5 text-[2.5rem] font-semibold leading-[1.08] tracking-tight sm:mt-6 sm:text-6xl sm:leading-[1.04] xl:text-7xl">
+            Run your whole business{" "}
+            <span className={`${gradientText} bf-shimmer-text`}>
+              from one place.
+            </span>
+          </h1>
+
+          <p
+            className={`mx-auto mt-5 max-w-lg text-[15px] leading-relaxed ${sub} sm:mt-6 sm:text-lg lg:mx-0`}
+          >
+            Customers, products, sales, jobs, payments and expenses in one
+            simple workspace, for shops and service businesses.
+          </p>
+
+          <div className="mt-8 flex flex-col items-stretch gap-3 min-[480px]:flex-row min-[480px]:items-center min-[480px]:justify-center sm:mt-9 sm:gap-4 lg:justify-start">
+            <Link
+              href="/register"
+              className={`${primaryBtn} relative overflow-hidden rounded-full px-8 py-3.5 text-center text-base font-semibold sm:px-9 sm:py-4`}
+            >
+              <span className="pointer-events-none absolute inset-x-4 top-0 h-1/2 rounded-b-full bg-linear-to-b from-white/40 to-transparent" />
+              <span className="relative">Create your workspace</span>
+            </Link>
+            <Link
+              href="/login"
+              className="rounded-full border border-indigo-900/20 bg-white/40 px-8 py-3.5 text-center text-base font-semibold backdrop-blur-xl transition hover:border-indigo-900/40 hover:bg-white/70 sm:py-4"
+            >
+              Sign in
+            </Link>
+          </div>
+
+          <a
+            href="#preview"
+            className="mt-7 inline-block text-sm font-medium text-indigo-800/70 transition hover:text-fuchsia-600 sm:mt-8"
+          >
+            See how it looks ↓
+          </a>
         </div>
 
-        {/* Wordmark */}
-        <h1 className="mt-8 pb-4 text-5xl drop-shadow-[0_0_30px_rgba(231,76,60,0.35)] sm:text-7xl">
-          <Wordmark wave />
-        </h1>
-
-        {/* Tagline */}
-        <p className="mt-5 max-w-xl bg-linear-to-r from-white via-[#e74c3c] to-orange-300 bg-clip-text text-xl font-semibold text-transparent sm:text-2xl">
-          Run your whole business from one place.
-        </p>
-
-        {/* Subcopy */}
-        <p className="mt-4 max-w-lg text-sm leading-relaxed text-slate-400 sm:text-base">
-          Customers, products, sales, jobs, payments and expenses in one simple
-          workspace, for shops and service businesses.
-        </p>
-
-        {/* CTA cluster with rings */}
-        <div className="relative mt-8 flex h-56 w-56 items-center justify-center">
-          <svg
-            className="bf-spin-slow pointer-events-none absolute -z-10 h-[46rem] w-[46rem] max-w-none text-[#e74c3c]"
-            viewBox="0 0 400 400"
-            fill="none"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <circle
-              cx="200"
-              cy="200"
-              r="190"
-              strokeOpacity="0.12"
-              strokeDasharray="2 8"
-            />
-            <circle cx="200" cy="200" r="140" strokeOpacity="0.16" />
-            <circle
-              cx="200"
-              cy="200"
-              r="90"
-              strokeOpacity="0.2"
-              strokeDasharray="6 10"
-            />
-            <circle cx="390" cy="200" r="5" fill="currentColor" stroke="none" />
-            <circle
-              cx="60"
-              cy="200"
-              r="4"
-              fill="currentColor"
-              stroke="none"
-              opacity="0.7"
-            />
-          </svg>
-
-          <span className="bf-ripple pointer-events-none absolute h-32 w-32 rounded-full border border-[#e74c3c]/60" />
-          <span className="bf-ripple pointer-events-none absolute h-32 w-32 rounded-full border border-[#e74c3c]/60 [animation-delay:1.07s]" />
-          <span className="bf-ripple pointer-events-none absolute h-32 w-32 rounded-full border border-[#e74c3c]/60 [animation-delay:2.14s]" />
-
-          <Link
-            href="/register"
-            className="group relative overflow-hidden rounded-full border border-[#e74c3c]/60 bg-[#e74c3c] px-9 py-4 text-base font-semibold text-white shadow-[0_0_30px_rgba(231,76,60,0.55),0_0_80px_rgba(231,76,60,0.25)] transition duration-300 hover:scale-105 hover:bg-[#c0392b] hover:shadow-[0_0_40px_rgba(231,76,60,0.7),0_0_100px_rgba(231,76,60,0.35)]"
-          >
-            <span className="pointer-events-none absolute inset-x-3 top-0 h-1/2 rounded-b-full bg-linear-to-b from-white/30 to-transparent" />
-            <span className="relative">Get started</span>
-          </Link>
-        </div>
-
-        {/* Secondary actions under the main CTA */}
-        <div className="mt-2 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/register"
-            className="rounded-full bg-[#e74c3c] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-[#e74c3c]/30 transition hover:bg-[#c0392b]"
-          >
-            Create your workspace
-          </Link>
-          <Link
-            href="/login"
-            className="rounded-full border border-white/20 px-7 py-3 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/5"
-          >
-            Sign in
-          </Link>
-        </div>
-
-        <a
-          href="#preview"
-          className="mt-8 text-sm font-medium text-slate-300 transition hover:text-white"
+        {/* Layered cards */}
+        <div
+          id="preview"
+          className="relative mx-auto w-full max-w-xl scroll-mt-24"
         >
-          See how it looks ↓
-        </a>
-      </section>
+          <div className="absolute -inset-3 -z-10 rounded-[2.5rem] bg-linear-to-br from-orange-300/60 via-fuchsia-300/50 to-sky-300/60 blur-2xl sm:-inset-6 sm:blur-3xl" />
 
-      {/* ── Preview ── */}
-      <section
-        id="preview"
-        className="mx-auto max-w-6xl scroll-mt-20 px-6 pb-24 pt-8"
-      >
-        <Reveal>
-          <div className="rounded-3xl border border-white/15 bg-[#023b6d] p-2 shadow-2xl shadow-black/40 sm:p-3">
-            <div className="flex items-center gap-2 px-3 py-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
-              <span className="ml-3 rounded-full bg-white/10 px-3 py-0.5 text-[10px] uppercase tracking-widest text-slate-300">
-                Preview
-              </span>
-            </div>
-
-            <div className="flex overflow-hidden rounded-2xl bg-slate-50 text-slate-900">
-              <div className="hidden w-44 shrink-0 border-r border-slate-200 bg-white p-3 sm:block">
-                <p className="px-2 pb-3 text-sm font-semibold">BizFlow</p>
-                {previewNav.map((item, i) => (
-                  <p
-                    key={item}
-                    className={`rounded-lg px-2 py-1.5 text-xs font-medium ${
-                      i === 0 ? "bg-[#023b6d] text-white" : "text-slate-500"
-                    }`}
-                  >
-                    {item}
-                  </p>
-                ))}
+          <Reveal>
+            <div className={`${glass} p-2 sm:p-3`}>
+              <div className="flex items-center gap-2 px-3 py-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-pink-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />
+                <span className="ml-3 rounded-full bg-white/60 px-3 py-0.5 text-[10px] font-semibold uppercase tracking-widest">
+                  Preview
+                </span>
               </div>
 
-              <div className="min-w-0 flex-1 p-5 sm:p-6">
-                <p className="text-lg font-semibold">Welcome back</p>
-                <p className="mt-0.5 text-xs text-slate-500">
+              <div className="overflow-hidden rounded-2xl border border-white/70 bg-white/40 p-3.5 text-left sm:p-5">
+                <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {previewNav.map((item, i) => (
+                    <span
+                      key={item}
+                      className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ${
+                        i === 0
+                          ? "bg-linear-to-r from-indigo-600 to-fuchsia-600 text-white"
+                          : "bg-white/60 text-indigo-800"
+                      }`}
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+
+                <p className="mt-4 text-base font-semibold sm:mt-5 sm:text-lg">
+                  Welcome back
+                </p>
+                <p className="mt-0.5 text-xs text-indigo-800/70">
                   Your business · Retail
                 </p>
 
-                <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-2.5">
                   {previewCards.map((label) => (
                     <div
                       key={label}
-                      className="rounded-xl border border-slate-200 bg-white p-4"
+                      className="min-w-0 rounded-xl border border-white/80 bg-white/60 p-2.5 sm:p-3"
                     >
-                      <p className="text-xs text-slate-500">{label}</p>
-                      <p className="mt-1.5 text-2xl font-semibold">0</p>
+                      <p className="truncate text-[10px] text-indigo-800/70 sm:text-[11px]">
+                        {label}
+                      </p>
+                      <p className="mt-1 text-xl font-semibold sm:text-2xl">
+                        0
+                      </p>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center">
-                  <p className="text-xs font-medium text-slate-600">
-                    Nothing here yet
-                  </p>
-                  <p className="mt-1 text-xs text-slate-400">
+                <div className="mt-4 rounded-xl border border-dashed border-indigo-900/25 bg-white/40 px-4 py-7 text-center sm:py-9">
+                  <p className="text-xs font-semibold">Nothing here yet</p>
+                  <p className="mt-1 text-xs text-indigo-800/70">
                     Sales you record will appear here.
                   </p>
                 </div>
               </div>
             </div>
+          </Reveal>
+
+          {/* Tilted chart card (tablet and up, kept inside the viewport) */}
+          <div
+            className={`${glass} bf-float absolute -top-10 right-0 z-10 hidden w-52 rotate-3 rounded-3xl p-4 text-left sm:block lg:-right-8 lg:w-56`}
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold">Reports</p>
+              <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest">
+                Revenue
+              </span>
+            </div>
+            <svg
+              viewBox="0 0 200 70"
+              className="mt-2 h-16 w-full"
+              fill="none"
+              aria-hidden="true"
+            >
+              <defs>
+                <linearGradient id="hero-area" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#c026d3" stopOpacity="0.45" />
+                  <stop offset="100%" stopColor="#c026d3" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M0 55 C25 48 35 30 60 36 S100 58 120 34 S165 8 200 6 L200 70 L0 70 Z"
+                fill="url(#hero-area)"
+              />
+              <path
+                d="M0 55 C25 48 35 30 60 36 S100 58 120 34 S165 8 200 6"
+                stroke="#6d28d9"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+              <circle cx="120" cy="34" r="4" fill="#6d28d9" />
+            </svg>
+          </div>
+
+          {/* Tilted receipt card */}
+          <div
+            className={`${glass} bf-float absolute -bottom-12 left-0 z-10 hidden w-48 -rotate-3 rounded-3xl p-4 text-left [animation-delay:1s] sm:block lg:-left-8 lg:w-52`}
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-bold">Receipt</p>
+              <span className="rounded-full bg-linear-to-r from-orange-400 to-pink-500 px-2.5 py-0.5 text-[10px] font-bold text-white">
+                Paid
+              </span>
+            </div>
+            <div className="mt-3 space-y-2 border-t border-dashed border-indigo-900/25 pt-3">
+              {[72, 54, 66].map((w) => (
+                <span
+                  key={w}
+                  className="block h-1.5 rounded-full bg-indigo-900/25"
+                  style={{ width: `${w}%` }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Alert chip */}
+          <div
+            className={`${glass} bf-float absolute -bottom-6 right-4 z-10 hidden items-center gap-3 rounded-2xl px-4 py-3 text-left [animation-delay:2s] md:flex`}
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-yellow-300 font-bold text-indigo-900">
+              !
+            </span>
+            <div>
+              <p className="text-xs font-bold">Low-stock alert</p>
+              <p className="text-[11px] text-indigo-800/70">Restock soon</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Number strip ── */}
+      <section className={`mx-auto max-w-6xl px-5 pt-8 sm:px-6 sm:pt-12 ${sectionPad}`}>
+        <Reveal>
+          <div
+            className={`${glass} grid grid-cols-2 overflow-hidden lg:grid-cols-4 lg:divide-x lg:divide-indigo-900/10`}
+          >
+            {stats.map((s, i) => (
+              <div
+                key={s.label}
+                className={`px-4 py-6 text-center sm:px-6 sm:py-8 ${
+                  i % 2 === 1
+                    ? "border-l border-indigo-900/10 lg:border-l-0"
+                    : ""
+                } ${i > 1 ? "border-t border-indigo-900/10 lg:border-t-0" : ""}`}
+              >
+                <p className={`${gradientText} text-4xl font-bold sm:text-5xl`}>
+                  {s.value}
+                </p>
+                <p className={`mt-1 text-xs font-medium sm:text-sm ${sub}`}>
+                  {s.label}
+                </p>
+              </div>
+            ))}
           </div>
         </Reveal>
       </section>
 
-      {/* ── Features ── */}
-      <section
-        id="features"
-        className="mx-auto max-w-6xl scroll-mt-20 px-6 pb-24"
-      >
-        <Reveal>
-          <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
-            Everything your business needs
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-center text-slate-400">
-            One workspace for the daily work, shaped around how your kind of
-            business actually runs.
-          </p>
-        </Reveal>
+      {/* ── Features: swipe carousel ── */}
+      <section id="features" className={`scroll-mt-20 ${sectionPad}`}>
+        <div className="mx-auto max-w-6xl px-5 sm:px-6">
+          <Reveal>
+            <Eyebrow>Features</Eyebrow>
+            <h2 className={h2}>Everything your business needs</h2>
+            <p className={`mx-auto mt-4 max-w-xl text-center text-[15px] ${sub} sm:text-base`}>
+              One workspace for the daily work, shaped around how your kind of
+              business actually runs.
+            </p>
+          </Reveal>
+        </div>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f, i) => (
-            <Reveal key={f.title} delay={(i % 3) * 120}>
-              <div className={card}>
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e74c3c]/20 text-[#e74c3c]">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d={f.d} />
-                  </svg>
+        <Reveal>
+          <div className="mt-10 flex snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-8 [scrollbar-width:none] sm:mt-14 sm:scroll-px-6 sm:gap-5 sm:px-6 [&::-webkit-scrollbar]:hidden lg:px-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))]">
+            {features.map((f, i) => (
+              <div
+                key={f.title}
+                className={`${glass} ${glassHover} relative w-[80%] max-w-[20rem] shrink-0 snap-start overflow-hidden p-6 sm:w-80 sm:max-w-none sm:p-8`}
+              >
+                <span className="pointer-events-none absolute -right-2 -top-4 text-7xl font-bold leading-none text-indigo-900/10 sm:text-8xl">
+                  0{i + 1}
                 </span>
-                <h3 className="mt-5 text-base font-semibold">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                <span
+                  className={`${iconBox} relative flex h-12 w-12 items-center justify-center rounded-2xl sm:h-14 sm:w-14`}
+                >
+                  <Icon d={f.d} />
+                </span>
+                <h3 className="relative mt-6 text-lg font-semibold sm:mt-8">
+                  {f.title}
+                </h3>
+                <p className={`relative mt-2 text-sm leading-relaxed ${sub}`}>
                   {f.text}
                 </p>
+                <span className="relative mt-6 block h-1 w-12 rounded-full bg-linear-to-r from-orange-400 to-fuchsia-500 sm:mt-8" />
               </div>
-            </Reveal>
-          ))}
-        </div>
+            ))}
+          </div>
+        </Reveal>
+        <p className="px-5 text-center text-xs font-medium text-indigo-800/60">
+          Swipe or scroll sideways to see more →
+        </p>
       </section>
 
-      {/* ── How it works ── */}
-      <section id="how" className="mx-auto max-w-6xl scroll-mt-20 px-6 pb-24">
+      {/* ── How it works: zig-zag on desktop, stacked on mobile ── */}
+      <section
+        id="how"
+        className={`mx-auto max-w-5xl scroll-mt-20 px-5 sm:px-6 ${sectionPad}`}
+      >
         <Reveal>
-          <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
-            Up and running in minutes
-          </h2>
+          <Eyebrow>How it works</Eyebrow>
+          <h2 className={h2}>Up and running in minutes</h2>
         </Reveal>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
+        <div className="mt-10 space-y-6 sm:mt-16 sm:space-y-10">
           {steps.map((s, i) => (
-            <Reveal key={s.n} delay={i * 130}>
-              <div className={card}>
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e74c3c] text-sm font-bold text-white shadow-lg shadow-[#e74c3c]/35">
-                  {s.n}
-                </span>
-                <h3 className="mt-5 text-base font-semibold">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-300">
-                  {s.text}
-                </p>
+            <Reveal key={s.n} delay={i * 100}>
+              <div
+                className={`grid items-center gap-2 md:grid-cols-2 md:gap-6 ${
+                  i % 2 === 1 ? "md:[&>*:first-child]:order-2" : ""
+                }`}
+              >
+                <div className="relative flex justify-center">
+                  <span className="absolute top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-linear-to-br from-orange-300/70 to-fuchsia-300/70 blur-2xl sm:h-40 sm:w-40" />
+                  <span
+                    className={`${gradientText} relative text-[5.5rem] font-bold leading-none sm:text-[9rem] md:text-[11rem]`}
+                  >
+                    {s.n}
+                  </span>
+                </div>
+
+                <div className={`${glass} ${glassHover} p-6 sm:p-10`}>
+                  <h3 className="text-lg font-semibold sm:text-xl">{s.title}</h3>
+                  <p className={`mt-3 text-sm leading-relaxed ${sub}`}>
+                    {s.text}
+                  </p>
+                  <span className="mt-5 block h-1 w-14 rounded-full bg-linear-to-r from-orange-400 to-fuchsia-500 sm:mt-6" />
+                </div>
               </div>
             </Reveal>
           ))}
@@ -392,30 +537,44 @@ export default async function HomePage() {
       </section>
 
       {/* ── Business types ── */}
-      <section className="mx-auto max-w-6xl px-6 pb-24">
+      <section className={`mx-auto max-w-6xl px-5 sm:px-6 ${sectionPad}`}>
         <Reveal>
-          <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
-            Built for two kinds of business
-          </h2>
+          <Eyebrow>Two flows</Eyebrow>
+          <h2 className={h2}>Built for two kinds of business</h2>
         </Reveal>
 
-        <div className="mt-12 grid gap-5 lg:grid-cols-2">
+        <div className="mt-10 grid gap-5 sm:mt-14 sm:gap-6 lg:grid-cols-2">
           {flows.map((flow, i) => (
             <Reveal key={flow.name} delay={i * 150}>
-              <div className={card}>
-                <h3 className="text-xl font-semibold text-[#e74c3c]">
-                  {flow.name}
-                </h3>
-                <p className="mt-1 text-sm text-slate-300">{flow.note}</p>
-                <ol className="mt-6 flex flex-wrap items-center gap-2 text-xs font-medium">
+              <div className={`${glass} h-full overflow-hidden`}>
+                <div
+                  className={`bg-linear-to-r ${flow.band} px-5 py-5 text-white sm:px-8 sm:py-7`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="text-2xl font-semibold sm:text-3xl">
+                        {flow.name}
+                      </h3>
+                      <p className="mt-1 text-[13px] text-white/90 sm:text-sm">
+                        {flow.note}
+                      </p>
+                    </div>
+                    <span className="shrink-0 whitespace-nowrap rounded-full bg-white/25 px-3 py-1 text-xs font-bold">
+                      {flow.steps.length} steps
+                    </span>
+                  </div>
+                </div>
+
+                <ol className="grid grid-cols-1 gap-2.5 p-4 min-[420px]:grid-cols-2 sm:gap-3 sm:p-8">
                   {flow.steps.map((step, n) => (
-                    <li key={step} className="flex items-center gap-2">
-                      <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5">
-                        {step}
+                    <li
+                      key={step}
+                      className="flex items-center gap-3 rounded-2xl border border-white/80 bg-white/55 px-4 py-2.5 sm:py-3"
+                    >
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-indigo-600 to-fuchsia-600 text-xs font-bold text-white">
+                        {n + 1}
                       </span>
-                      {n < flow.steps.length - 1 && (
-                        <span className="text-[#e74c3c]">→</span>
-                      )}
+                      <span className="text-sm font-semibold">{step}</span>
                     </li>
                   ))}
                 </ol>
@@ -425,57 +584,93 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Foundations ── */}
-      <section className="mx-auto max-w-6xl px-6 pb-24">
+      {/* ── Foundations: checkerboard bento ── */}
+      <section className={`mx-auto max-w-6xl px-5 sm:px-6 ${sectionPad}`}>
         <Reveal>
-          <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
-            Built on solid foundations
+          <Eyebrow>Trust</Eyebrow>
+          <h2 className={h2}>
+            Built on solid <span className={gradientText}>foundations</span>
           </h2>
         </Reveal>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {foundations.map((f, i) => (
-            <Reveal key={f.title} delay={i * 100}>
-              <div className={`${card} h-full`}>
-                <span className="block h-1 w-8 rounded-full bg-[#e74c3c]" />
-                <h3 className="mt-4 text-sm font-semibold">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-300">
-                  {f.text}
-                </p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <Reveal>
+          <div className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+            {foundations.map((f, i) => {
+              const filled = i === 0 || i === 3;
+              const wide = i === 0 || i === 3;
+              const fill =
+                i === 0
+                  ? "bg-linear-to-br from-indigo-600 via-violet-600 to-fuchsia-600"
+                  : "bg-linear-to-br from-orange-400 via-pink-500 to-fuchsia-500";
+              return (
+                <div
+                  key={f.title}
+                  className={`${
+                    filled
+                      ? `${fill} relative overflow-hidden rounded-3xl text-white shadow-[0_18px_50px_rgba(124,58,237,0.35)]`
+                      : `${glass} ${glassHover}`
+                  } p-6 sm:p-8 ${wide ? "lg:col-span-2" : ""}`}
+                >
+                  <span
+                    className={`flex h-12 w-12 items-center justify-center rounded-2xl sm:h-14 sm:w-14 ${
+                      filled ? "bg-white/25 text-white" : iconBox
+                    }`}
+                  >
+                    <Icon d={f.d} />
+                  </span>
+                  <h3 className="mt-5 text-lg font-semibold sm:mt-6">
+                    {f.title}
+                  </h3>
+                  <p
+                    className={`mt-2 max-w-md text-sm leading-relaxed ${
+                      filled ? "text-white/90" : sub
+                    }`}
+                  >
+                    {f.text}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </Reveal>
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" className="mx-auto max-w-3xl scroll-mt-20 px-6 pb-24">
+      <section
+        id="faq"
+        className={`mx-auto max-w-3xl scroll-mt-20 px-5 sm:px-6 ${sectionPad}`}
+      >
         <Reveal>
-          <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
-            Questions, answered
-          </h2>
+          <Eyebrow>FAQ</Eyebrow>
+          <h2 className={h2}>Questions, answered</h2>
         </Reveal>
 
-        <div className="mt-10 space-y-3">
+        <div className="mt-8 space-y-3 sm:mt-12">
           {faqs.map((f, i) => (
             <Reveal key={f.q} delay={i * 80}>
-              <details className="group rounded-2xl border border-white/10 bg-[#023b6d] px-6 py-4 open:border-[#e74c3c]/40">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold [&::-webkit-details-marker]:hidden">
-                  {f.q}
-                  <svg
-                    viewBox="0 0 20 20"
-                    className="h-4 w-4 shrink-0 text-[#e74c3c] transition group-open:rotate-180"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M5 8l5 5 5-5" />
-                  </svg>
+              <details
+                className={`${glass} group rounded-2xl px-4 py-4 transition open:bg-white/65 sm:px-6 sm:py-5`}
+              >
+                <summary className="flex cursor-pointer list-none items-center gap-3 text-sm font-semibold sm:gap-4 [&::-webkit-details-marker]:hidden">
+                  <span className="text-xs font-bold text-fuchsia-600">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="min-w-0 flex-1">{f.q}</span>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/70 text-fuchsia-600 transition duration-300 group-open:rotate-45 group-open:bg-linear-to-br group-open:from-indigo-600 group-open:to-fuchsia-600 group-open:text-white">
+                    <svg
+                      viewBox="0 0 20 20"
+                      className="h-3.5 w-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M10 4v12M4 10h12" />
+                    </svg>
+                  </span>
                 </summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                <p className={`mt-3 text-sm leading-relaxed ${sub} sm:pl-9`}>
                   {f.a}
                 </p>
               </details>
@@ -484,56 +679,77 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── CTA ── */}
-      <section className="px-6 pb-24">
+      {/* ── CTA: bold gradient banner ── */}
+      <section className={`px-4 sm:px-6 ${sectionPad}`}>
         <Reveal>
-          <div className="mx-auto max-w-3xl rounded-3xl border border-white/15 bg-[#023b6d] p-10 text-center shadow-2xl shadow-black/30">
-            <h2 className="text-3xl font-semibold tracking-tight">
-              Ready to get organised?
-            </h2>
-            <p className="mt-3 text-slate-300">
-              Create your workspace in a couple of minutes.
-            </p>
-            <Link
-              href="/register"
-              className="mt-8 inline-block rounded-xl bg-[#e74c3c] px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#e74c3c]/30 transition hover:bg-[#c0392b]"
-            >
-              Create your account
-            </Link>
+          <div className="relative mx-auto max-w-5xl">
+            <div className="absolute -inset-3 -z-10 rounded-[2.5rem] bg-linear-to-r from-orange-300/70 via-fuchsia-300/60 to-indigo-300/70 blur-2xl sm:-inset-4 sm:blur-3xl" />
+            <div className="relative overflow-hidden rounded-[2rem] bg-linear-to-br from-indigo-600 via-fuchsia-600 to-orange-500 px-6 py-12 text-center text-white shadow-[0_25px_70px_rgba(109,40,217,0.45)] sm:rounded-[2.5rem] sm:px-16 sm:py-20">
+              <svg
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[24rem] w-[24rem] max-w-none -translate-x-1/2 -translate-y-1/2 text-white sm:h-[34rem] sm:w-[34rem]"
+                viewBox="0 0 400 400"
+                fill="none"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <circle cx="200" cy="200" r="190" strokeOpacity="0.2" />
+                <circle
+                  cx="200"
+                  cy="200"
+                  r="140"
+                  strokeOpacity="0.25"
+                  strokeDasharray="3 8"
+                />
+                <circle cx="200" cy="200" r="90" strokeOpacity="0.3" />
+              </svg>
+
+              <h2 className="relative text-2xl font-semibold tracking-tight min-[400px]:text-3xl sm:text-5xl">
+                Ready to get organised?
+              </h2>
+              <p className="relative mt-3 text-[15px] text-white/90 sm:mt-4 sm:text-base">
+                Create your workspace in a couple of minutes.
+              </p>
+              <Link
+                href="/register"
+                className="relative mt-7 inline-block rounded-full bg-amber-300 px-8 py-3.5 text-base font-bold text-indigo-900 shadow-[0_10px_35px_rgba(252,211,77,0.6)] transition duration-300 hover:scale-105 hover:bg-amber-200 sm:mt-9 sm:px-10 sm:py-4"
+              >
+                Create your account
+              </Link>
+            </div>
           </div>
         </Reveal>
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-white/10">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 sm:grid-cols-3">
-          <div>
+      <footer className="border-t border-white/70 bg-white/30 backdrop-blur-xl">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-8 px-5 py-10 sm:px-6 sm:py-14 lg:grid-cols-4 lg:gap-10">
+          <div className="col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2.5">
               <Logo size={28} />
-              <Wordmark className="text-base" />
+              <Wordmark tone="dark" className="text-base" />
             </div>
-            <p className="mt-3 max-w-xs text-sm text-slate-500">
+            <p className={`mt-3 max-w-xs text-sm ${sub}`}>
               Run your whole business from one place.
             </p>
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <p className="text-xs font-bold uppercase tracking-wider text-fuchsia-700">
               Product
             </p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-500">
+            <ul className={`mt-3 space-y-2 text-sm ${sub}`}>
               <li>
-                <a href="#features" className="transition hover:text-white">
+                <a href="#features" className="transition hover:text-fuchsia-700">
                   Features
                 </a>
               </li>
               <li>
-                <a href="#how" className="transition hover:text-white">
+                <a href="#how" className="transition hover:text-fuchsia-700">
                   How it works
                 </a>
               </li>
               <li>
-                <a href="#faq" className="transition hover:text-white">
+                <a href="#faq" className="transition hover:text-fuchsia-700">
                   FAQ
                 </a>
               </li>
@@ -541,25 +757,39 @@ export default async function HomePage() {
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <p className="text-xs font-bold uppercase tracking-wider text-fuchsia-700">
               Account
             </p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-500">
+            <ul className={`mt-3 space-y-2 text-sm ${sub}`}>
               <li>
-                <Link href="/login" className="transition hover:text-white">
+                <Link href="/login" className="transition hover:text-fuchsia-700">
                   Sign in
                 </Link>
               </li>
               <li>
-                <Link href="/register" className="transition hover:text-white">
+                <Link
+                  href="/register"
+                  className="transition hover:text-fuchsia-700"
+                >
                   Create account
                 </Link>
               </li>
             </ul>
           </div>
+
+          <div className="col-span-2 lg:col-span-1">
+            <p className="text-xs font-bold uppercase tracking-wider text-fuchsia-700">
+              Markets
+            </p>
+            <ul className={`mt-3 space-y-2 text-sm ${sub}`}>
+              <li>Nigeria · Ghana · Kenya</li>
+              <li>South Africa</li>
+              <li>United Kingdom · United States</li>
+            </ul>
+          </div>
         </div>
 
-        <p className="border-t border-white/10 py-6 text-center text-xs text-slate-600">
+        <p className="border-t border-white/70 py-5 text-center text-xs text-indigo-800/60 sm:py-6">
           © {new Date().getFullYear()} BizFlow
         </p>
       </footer>
