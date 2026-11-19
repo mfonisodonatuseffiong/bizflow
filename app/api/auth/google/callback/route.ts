@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { after, type NextRequest } from "next/server";
 import { exchangeGoogleCode } from "@/lib/google";
+import { postLoginPath } from "@/lib/pending-invite";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
 import { getSignInMeta, sendSignInAlert } from "@/lib/sign-in-alert";
@@ -12,7 +13,9 @@ async function signInWithGoogle(code: string, verifier: string): Promise<string>
   const profile = await exchangeGoogleCode(code, verifier);
   if (!profile.email || !profile.emailVerified) return "/login?error=google_unverified";
 
-  const email = profile.email;
+  // Stored emails are lowercase everywhere else (register, login, invites).
+  const email = profile.email.trim().toLowerCase();
+  const name = profile.name ?? email.split("@")[0];
 
   const linked = await prisma.account.findUnique({
     where: {
@@ -39,7 +42,7 @@ async function signInWithGoogle(code: string, verifier: string): Promise<string>
       select: { id: true },
       data: {
         email,
-        name: profile.name ?? email.split("@")[0],
+        name,
         accounts: {
           create: { provider: "google", providerAccountId: profile.sub },
         },
@@ -53,15 +56,10 @@ async function signInWithGoogle(code: string, verifier: string): Promise<string>
   // Email the user about this sign-in. Runs after the response is sent,
   // so it never slows down or blocks the login.
   const meta = await getSignInMeta();
-  after(() =>
-    sendSignInAlert(
-      { email, name: profile.name ?? email.split("@")[0] },
-      "google",
-      meta,
-    ),
-  );
+  after(() => sendSignInAlert({ email, name }, "google", meta));
 
-  return "/dashboard";
+  // Back to the invitation if one is pending, otherwise the dashboard.
+  return await postLoginPath();
 }
 
 export async function GET(request: NextRequest) {

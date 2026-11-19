@@ -42,6 +42,7 @@ model Business {
   timezone       String
   createdAt      DateTime             @default(now())
   memberships    BusinessMembership[]
+  invitations    Invitation[]
   categories     Category[]
   products       Product[]
   stockMovements StockMovement[]
@@ -75,6 +76,23 @@ model BusinessMembership {
 
   @@unique([userId, businessId])
   @@index([businessId])
+}
+
+model Invitation {
+  id          String    @id @default(cuid())
+  businessId  String
+  email       String
+  role        Role
+  tokenHash   String    @unique
+  invitedById String?
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([email])
 }
 
 model Account {

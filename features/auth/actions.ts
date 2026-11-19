@@ -1,8 +1,10 @@
 "use server";
 
 import argon2 from "argon2";
-import { businessTypes, countries } from "@/features/business/config";
 import { redirect } from "next/navigation";
+import { BusinessType } from "@/app/generated/prisma/enums";
+import { businessTypes, countries } from "@/features/business/config";
+import { hasPendingInvite, postLoginPath } from "@/lib/pending-invite";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
 
@@ -36,44 +38,61 @@ export async function registerAction(
   const countryCode = String(formData.get("country") ?? "");
 
   if (name.length < 2) return fail("Enter your full name.");
-  if (!EMAIL_PATTERN.test(email)) return fail("Enter a valid email address.");
+  if (!EMAIL_PATTERN.test(email) || email.length > 254) {
+    return fail("Enter a valid email address.");
+  }
   if (password.length < 8) return fail("Use a password of at least 8 characters.");
   if (password.length > 128) return fail("That password is too long.");
-  if (businessName.length < 2) return fail("Enter your business name.");
 
-  const businessType = businessTypes.find((t) => t.value === businessTypeRaw);
-  if (!businessType) return fail("Select a business type.");
+  // Someone who arrived from an invitation link may join an existing
+  // business without creating their own. Everyone else must set one up.
+  const invited = await hasPendingInvite();
+  const createBusiness = !invited || businessName.length > 0;
 
-  // Currency and timezone come from our config, never from the browser.
-  const country = countries.find((c) => c.code === countryCode);
-  if (!country) return fail("Select a country.");
+  let business:
+    | {
+        name: string;
+        type: BusinessType;
+        country: string;
+        currency: string;
+        timezone: string;
+      }
+    | undefined;
+
+  if (createBusiness) {
+    if (businessName.length < 2) return fail("Enter your business name.");
+
+    const businessType = businessTypes.find((t) => t.value === businessTypeRaw);
+    if (!businessType) return fail("Select a business type.");
+
+    // Currency and timezone come from our config, never from the browser.
+    const country = countries.find((c) => c.code === countryCode);
+    if (!country) return fail("Select a country.");
+
+    business = {
+      name: businessName,
+      type: businessType.value.toUpperCase() as BusinessType,
+      country: country.code,
+      currency: country.currency,
+      timezone: country.timezone,
+    };
+  }
 
   let userId: string;
   try {
     const passwordHash = await argon2.hash(password);
 
-    // One nested create = one transaction: user, business and OWNER
-    // membership are all created, or none are.
+    // One nested create = one transaction: the user and, when there is
+    // one, the business and OWNER membership are all created, or none are.
     const user = await prisma.user.create({
       select: { id: true },
       data: {
         name,
         email,
         passwordHash,
-        memberships: {
-          create: {
-            role: "OWNER",
-            business: {
-              create: {
-                name: businessName,
-                type: businessType.value,
-                country: country.code,
-                currency: country.currency,
-                timezone: country.timezone,
-              },
-            },
-          },
-        },
+        memberships: business
+          ? { create: { role: "OWNER", business: { create: business } } }
+          : undefined,
       },
     });
     userId = user.id;
@@ -86,5 +105,6 @@ export async function registerAction(
   }
 
   await createSession(userId);
-  redirect("/dashboard");
+  // Back to the invitation if there is one, otherwise the dashboard.
+  redirect(await postLoginPath());
 }
