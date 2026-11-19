@@ -30,11 +30,16 @@ export function ProductForm({
   const [newCategory, setNewCategory] = useState("");
   const [creatingCategory, setCreatingCategory] = useState(false);
 
+  // Reset the category when a save succeeds. Adjusting state during render
+  // is the pattern React recommends instead of calling setState in an effect.
+  const [handledState, setHandledState] = useState(state);
+  if (state !== handledState) {
+    setHandledState(state);
+    if (state.status === "success") setCategoryId("");
+  }
+
   useEffect(() => {
-    if (state.status === "success") {
-      formRef.current?.reset();
-      setCategoryId("");
-    }
+    if (state.status === "success") formRef.current?.reset();
   }, [state]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

@@ -17,12 +17,30 @@ function isUniqueViolation(error: unknown) {
 }
 
 function parse(formData: FormData) {
-  return customerSchema.safeParse({
+  const parsed = customerSchema.safeParse({
     name: formData.get("name") ?? "",
     phone: formData.get("phone") ?? "",
     email: formData.get("email") ?? "",
     address: formData.get("address") ?? "",
   });
+  if (!parsed.success) return parsed;
+  // Blank optional fields are stored as null, so the unique phone index
+  // never sees two empty strings as duplicates.
+  return {
+    success: true as const,
+    data: {
+      name: parsed.data.name,
+      phone: parsed.data.phone || null,
+      email: parsed.data.email || null,
+      address: parsed.data.address || null,
+    },
+  };
+}
+
+function refresh() {
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/customers");
+  revalidatePath("/dashboard/sales");
 }
 
 export async function createCustomerAction(
@@ -43,7 +61,7 @@ export async function createCustomerAction(
     return fail("Something went wrong. Please try again.");
   }
 
-  revalidatePath("/dashboard/customers");
+  refresh();
   return { status: "success", message: "Customer added." };
 }
 
@@ -70,7 +88,7 @@ export async function updateCustomerAction(
     return fail("Something went wrong. Please try again.");
   }
 
-  revalidatePath("/dashboard/customers");
+  refresh();
   return { status: "success", message: "Customer updated." };
 }
 
@@ -83,5 +101,5 @@ export async function toggleCustomerActiveAction(formData: FormData): Promise<vo
     where: { id: customerId, businessId: business.id },
     data: { isActive: active },
   });
-  revalidatePath("/dashboard/customers");
+  refresh();
 }

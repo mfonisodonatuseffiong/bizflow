@@ -1,6 +1,7 @@
 "use client";
 
 import { startTransition, useActionState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 import { updateCustomerAction, type CustomerFormState } from "@/features/customers/actions";
 
 const inputClass =
@@ -18,7 +19,10 @@ export function EditCustomer({
   );
 
   useEffect(() => {
-    if (state.status === "success" && detailsRef.current) detailsRef.current.open = false;
+    if (state.status === "success") {
+      if (detailsRef.current) detailsRef.current.open = false;
+      toast.success(state.message ?? "Customer updated.");
+    }
   }, [state]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { isOwner, requireBusinessContext } from "@/features/auth/context";
-import { businessTypes, countries } from "@/features/business/config";
+import { businessTypes } from "@/features/business/config";
 import { BusinessNameForm } from "@/features/settings/business-form";
 import { listTeam } from "@/features/settings/queries";
 
@@ -44,8 +44,11 @@ export default async function SettingsPage() {
   const { user, business, role } = await requireBusinessContext();
   const team = await listTeam(business.id);
 
+  // Compare in uppercase: the database stores the enum in uppercase,
+  // while the config values may be lowercase.
   const typeLabel =
-    businessTypes.find((t) => t.value === business.type)?.label ?? business.type;
+    businessTypes.find((t) => t.value.toUpperCase() === String(business.type).toUpperCase())
+      ?.label ?? business.type;
 
   const details = [
     { label: "Business type", value: typeLabel },
