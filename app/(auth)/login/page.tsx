@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AuthLayout } from "@/features/auth/auth-layout";
 import { getCurrentUser } from "@/features/auth/current-user";
+import { postLoginPath } from "@/lib/pending-invite";
 import LoginForm from "./login-form";
 
 export const metadata: Metadata = {
@@ -22,12 +23,17 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  if (await getCurrentUser()) redirect("/dashboard");
+  // Already signed in: go to the pending invite if there is one, else the dashboard.
+  if (await getCurrentUser()) redirect(await postLoginPath());
+
   const { error } = await searchParams;
+  // Only accept our own keys, so a crafted ?error=constructor can't break the page.
+  const notice =
+    error && Object.hasOwn(NOTICES, error) ? NOTICES[error] : undefined;
 
   return (
     <AuthLayout>
-      <LoginForm notice={error ? NOTICES[error] : undefined} />
+      <LoginForm notice={notice} />
     </AuthLayout>
   );
 }

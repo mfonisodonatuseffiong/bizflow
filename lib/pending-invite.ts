@@ -19,13 +19,18 @@ export async function clearPendingInvite() {
   (await cookies()).delete(COOKIE);
 }
 
-// Where to send someone right after they sign in.
-export async function postLoginPath() {
+// The pending invite token, or null if there is none or it is malformed.
+export async function getPendingInviteToken() {
   const token = (await cookies()).get(COOKIE)?.value;
-  return token && TOKEN.test(token) ? `/invite/${token}` : "/dashboard";
+  return token && TOKEN.test(token) ? token : null;
 }
 
 export async function hasPendingInvite() {
-  const token = (await cookies()).get(COOKIE)?.value;
-  return !!token && TOKEN.test(token);
+  return (await getPendingInviteToken()) !== null;
+}
+
+// Where to send someone right after they sign in.
+export async function postLoginPath() {
+  const token = await getPendingInviteToken();
+  return token ? `/invite/${token}` : "/dashboard";
 }
