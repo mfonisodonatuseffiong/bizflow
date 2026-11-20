@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/prisma";
 
 const COOKIE = "bizflow_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -13,7 +14,12 @@ function key() {
 }
 
 export async function createSession(userId: string) {
-  const token = await new SignJWT({})
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { sessionVersion: true },
+  });
+
+  const token = await new SignJWT({ sv: user?.sessionVersion ?? 0 })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)
     .setIssuedAt()
@@ -33,13 +39,18 @@ export async function destroySession() {
   (await cookies()).delete(COOKIE);
 }
 
-export async function getSessionUserId(): Promise<string | null> {
+export async function getSession(): Promise<{ userId: string; sv: number } | null> {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, key(), { algorithms: ["HS256"] });
-    return payload.sub ?? null;
+    if (!payload.sub) return null;
+    return { userId: payload.sub, sv: typeof payload.sv === "number" ? payload.sv : 0 };
   } catch {
     return null;
   }
+}
+
+export async function getSessionUserId(): Promise<string | null> {
+  return (await getSession())?.userId ?? null;
 }

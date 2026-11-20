@@ -1,7 +1,6 @@
-import { redirect } from "next/navigation";
 import { Toaster } from "sonner";
 import { AuthBackground } from "@/features/auth/auth-background";
-import { requireUser } from "@/features/auth/current-user";
+import { requireBusinessContext } from "@/features/auth/context";
 import { getBusinessCategory } from "@/features/business/config";
 import { getNavItems } from "@/features/dashboard/nav";
 import { Sidebar } from "@/features/dashboard/sidebar";
@@ -13,11 +12,9 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await requireUser();
-  const membership = user.memberships[0];
-  if (!membership) redirect("/onboarding");
-
-  const { business, role } = membership;
+  // Redirects to login or onboarding when needed, and honours the
+  // business the user switched to.
+  const { user, business, role, businesses } = await requireBusinessContext();
   const items = getNavItems(getBusinessCategory(business.type));
 
   return (
@@ -27,7 +24,8 @@ export default async function DashboardLayout({
       <div className="flex min-w-0 flex-1 flex-col">
         <Header
           menu={<MobileNav items={items} businessName={business.name} />}
-          businessName={business.name}
+          businesses={businesses.map((b) => ({ id: b.id, name: b.name }))}
+          activeBusinessId={business.id}
           role={role}
           userName={user.name}
           userEmail={user.email}

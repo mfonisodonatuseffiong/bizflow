@@ -21,19 +21,20 @@ const NOTICES: Record<string, string> = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; reset?: string }>;
 }) {
   // Already signed in: go to the pending invite if there is one, else the dashboard.
   if (await getCurrentUser()) redirect(await postLoginPath());
 
-  const { error } = await searchParams;
+  const { error, reset } = await searchParams;
   // Only accept our own keys, so a crafted ?error=constructor can't break the page.
-  const notice =
-    error && Object.hasOwn(NOTICES, error) ? NOTICES[error] : undefined;
+  const notice = error && Object.hasOwn(NOTICES, error) ? NOTICES[error] : undefined;
+  const info =
+    reset === "1" ? "Password updated. Sign in with your new password." : undefined;
 
   return (
     <AuthLayout>
-      <LoginForm notice={notice} />
+      <LoginForm notice={notice} info={info} />
     </AuthLayout>
   );
 }

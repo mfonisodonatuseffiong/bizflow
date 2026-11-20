@@ -1,14 +1,17 @@
 import { logoutAction } from "@/features/auth/login";
+import { BusinessSwitcher } from "@/features/dashboard/business-switcher";
 import { SignOutButton } from "@/features/dashboard/sign-out-button";
 
 export function Header({
-  businessName,
+  businesses,
+  activeBusinessId,
   role,
   userName,
   userEmail,
   menu,
 }: {
-  businessName: string;
+  businesses: { id: string; name: string }[];
+  activeBusinessId: string;
   role: string;
   userName: string;
   userEmail: string;
@@ -32,9 +35,7 @@ export function Header({
 
       <div className="flex min-w-0 items-center gap-3">
         {menu}
-        <h2 className="truncate text-sm font-semibold text-indigo-900">
-          {businessName}
-        </h2>
+        <BusinessSwitcher businesses={businesses} activeId={activeBusinessId} />
         <span className="rounded-full bg-fuchsia-500/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fuchsia-700 ring-1 ring-fuchsia-500/40">
           {role}
         </span>

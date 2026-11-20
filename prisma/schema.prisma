@@ -57,11 +57,26 @@ model User {
   email          String               @unique
   name           String
   passwordHash   String?
+  sessionVersion Int                  @default(0)
   createdAt      DateTime             @default(now())
   memberships    BusinessMembership[]
   accounts       Account[]
+  passwordResets PasswordReset[]
   stockMovements StockMovement[]
   expenses       Expense[]
+}
+
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model BusinessMembership {

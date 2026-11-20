@@ -1,18 +1,19 @@
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getSessionUserId } from "@/lib/session";
+import { getSession } from "@/lib/session";
 
 export const getCurrentUser = cache(async () => {
-  const userId = await getSessionUserId();
-  if (!userId) return null;
+  const session = await getSession();
+  if (!session) return null;
 
-  return prisma.user.findUnique({
-    where: { id: userId },
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
     select: {
       id: true,
       name: true,
       email: true,
+      sessionVersion: true,
       memberships: {
         orderBy: { createdAt: "asc" },
         select: {
@@ -24,6 +25,10 @@ export const getCurrentUser = cache(async () => {
       },
     },
   });
+
+  // A password reset bumps sessionVersion, which ends every older session.
+  if (!user || user.sessionVersion !== session.sv) return null;
+  return user;
 });
 
 export async function requireUser() {
