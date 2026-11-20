@@ -1,12 +1,12 @@
 "use client";
 
 import { startTransition, useActionState } from "react";
+import { PasswordInput } from "@/features/auth/password-input";
 import {
   AuthCard,
   SubmitButton,
   alertClass,
   headingClass,
-  inputClass,
   labelClass,
 } from "@/features/auth/auth-card";
 import { resetPasswordAction, type ResetState } from "@/features/auth/password-reset";
@@ -38,16 +38,14 @@ export default function ResetForm({ token }: { token: string }) {
           <label htmlFor="password" className={labelClass}>
             New password
           </label>
-          <input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="new-password"
             required
             minLength={8}
             maxLength={128}
             placeholder="At least 8 characters"
-            className={inputClass}
           />
         </div>
 
@@ -55,16 +53,14 @@ export default function ResetForm({ token }: { token: string }) {
           <label htmlFor="confirm" className={labelClass}>
             Confirm password
           </label>
-          <input
+          <PasswordInput
             id="confirm"
             name="confirm"
-            type="password"
             autoComplete="new-password"
             required
             minLength={8}
             maxLength={128}
             placeholder="Repeat the password"
-            className={inputClass}
           />
         </div>
 

@@ -94,31 +94,34 @@ export async function resetPasswordAction(
   try {
     const passwordHash = await argon2.hash(password);
 
-    userId = await prisma.$transaction(async (tx) => {
-      const reset = await tx.passwordReset.findUnique({
-        where: { tokenHash: hashResetToken(token) },
-      });
-      if (!reset || reset.usedAt || reset.expiresAt.getTime() < Date.now()) return null;
+    userId = await prisma.$transaction(
+      async (tx) => {
+        const reset = await tx.passwordReset.findUnique({
+          where: { tokenHash: hashResetToken(token) },
+        });
+        if (!reset || reset.usedAt || reset.expiresAt.getTime() < Date.now()) return null;
 
-      // Single use: only one request can flip usedAt from null.
-      const claimed = await tx.passwordReset.updateMany({
-        where: { id: reset.id, usedAt: null },
-        data: { usedAt: new Date() },
-      });
-      if (claimed.count === 0) return null;
+        // Single use: only one request can flip usedAt from null.
+        const claimed = await tx.passwordReset.updateMany({
+          where: { id: reset.id, usedAt: null },
+          data: { usedAt: new Date() },
+        });
+        if (claimed.count === 0) return null;
 
-      // New password, and every existing session stops working.
-      await tx.user.update({
-        where: { id: reset.userId },
-        data: { passwordHash, sessionVersion: { increment: 1 } },
-      });
-      // Any other outstanding links die too.
-      await tx.passwordReset.updateMany({
-        where: { userId: reset.userId, usedAt: null },
-        data: { usedAt: new Date() },
-      });
-      return reset.userId;
-    });
+        // New password, and every existing session stops working.
+        await tx.user.update({
+          where: { id: reset.userId },
+          data: { passwordHash, sessionVersion: { increment: 1 } },
+        });
+        // Any other outstanding links die too.
+        await tx.passwordReset.updateMany({
+          where: { userId: reset.userId, usedAt: null },
+          data: { usedAt: new Date() },
+        });
+        return reset.userId;
+      },
+      { maxWait: 15_000, timeout: 30_000 },
+    );
   } catch (error) {
     console.error("resetPasswordAction failed", error);
     return fail("Something went wrong. Please try again.");

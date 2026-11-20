@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { canManageCatalog } from "@/features/auth/context";
-import { requireUser } from "@/features/auth/current-user";
+import { canManageCatalog, requireBusinessContext } from "@/features/auth/context";
 import { getBusinessCategory } from "@/features/business/config";
 import { Reveal } from "@/features/ui/reveal";
 import { prisma } from "@/lib/prisma";
@@ -52,8 +51,7 @@ const accentLine =
 const muted = "text-indigo-800/70";
 
 export default async function DashboardPage() {
-  const user = await requireUser();
-  const { business, role } = user.memberships[0];
+  const { user, business, role } = await requireBusinessContext();
   const category = getBusinessCategory(business.type);
   const retail = category === "RETAIL";
   const firstName = user.name.split(" ")[0];

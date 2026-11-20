@@ -4,6 +4,7 @@ import Link from "next/link";
 import { GoogleButton } from "@/features/auth/google-button";
 import { startTransition, useActionState } from "react";
 import { loginAction, type LoginState } from "@/features/auth/login";
+import { PasswordInput } from "@/features/auth/password-input";
 import {
   AuthCard,
   SubmitButton,
@@ -75,14 +76,12 @@ export default function LoginForm({
               Forgot password?
             </Link>
           </div>
-          <input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="current-password"
             required
             placeholder="Your password"
-            className={inputClass}
           />
         </div>
 

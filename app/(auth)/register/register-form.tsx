@@ -10,6 +10,7 @@ import ZA from "country-flag-icons/react/3x2/ZA";
 import GB from "country-flag-icons/react/3x2/GB";
 import US from "country-flag-icons/react/3x2/US";
 import { registerAction, type RegisterState } from "@/features/auth/actions";
+import { PasswordInput } from "@/features/auth/password-input";
 import { businessTypes, countries } from "@/features/business/config";
 import {
   AuthCard,
@@ -108,16 +109,14 @@ export default function RegisterForm({
           <label htmlFor="password" className={labelClass}>
             Password
           </label>
-          <input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="new-password"
             required
             minLength={8}
             maxLength={128}
             placeholder="At least 8 characters"
-            className={inputClass}
           />
         </div>
 
